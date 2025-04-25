@@ -85,6 +85,13 @@
 			<scope>provided</scope>
 		</dependency>
 
+		<!-- 0bligatoire pour Spring Boot 3+) -->
+		<dependency>
+			<groupId>jakarta.servlet</groupId>
+			<artifactId>jakarta.servlet-api</artifactId>
+			<scope>provided</scope>
+		</dependency>
+
 		<dependency>
 			<groupId>org.springframework.boot</groupId>
 			<artifactId>spring-boot-starter-test</artifactId>
