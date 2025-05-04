@@ -6,26 +6,32 @@ import lombok.Setter;
 
 @Getter
 @Entity
-@Table(name = "users") //
-public class User {
+@Table(name = "app_users")
+public class AppUser {
 
     @Id
-    @Column(name = "username")
+    @Column(name = "user_id")
+    @GeneratedValue(strategy = GenerationType.IDENTITY)
+    private Long id;
+
+    @Setter
+    @Column(length = 50)
     private String username;
 
     @Setter
     private String password;
 
     @Setter
+    @Column(name = "role_id", length = 50)
     private String role;
 
     @Setter
     private boolean enabled;
 
     // Constructeur vide obligatoire, Getters, setters géré par Lombok
-    public User() {}
+    public AppUser() {}
 
-    public User(String username, String password, String role, boolean enabled) {
+    public AppUser(String username, String password, String role, boolean enabled) {
         this.username = username;
         this.password = password;
         this.role = role;

@@ -2,8 +2,8 @@ package com.eni.fleetviewer.back.controller;
 
 import com.eni.fleetviewer.back.dto.LoginRequest;
 import com.eni.fleetviewer.back.dto.LoginResponse;
-import com.eni.fleetviewer.back.model.User;
-import com.eni.fleetviewer.back.repository.UserRepository;
+import com.eni.fleetviewer.back.model.AppUser;
+import com.eni.fleetviewer.back.repository.AppUserRepository;
 import com.eni.fleetviewer.back.service.JwtService;
 import org.springframework.http.ResponseEntity;
 import org.springframework.security.authentication.*;
@@ -18,12 +18,12 @@ public class AuthController {
 
     private final AuthenticationManager authenticationManager;
     private final JwtService jwtService;
-    private final UserRepository userRepository;
+    private final AppUserRepository appUserRepository;
 
-    public AuthController(AuthenticationManager authenticationManager, JwtService jwtService, UserRepository userRepository) {
+    public AuthController(AuthenticationManager authenticationManager, JwtService jwtService, AppUserRepository appUserRepository) {
         this.authenticationManager = authenticationManager;
         this.jwtService = jwtService;
-        this.userRepository = userRepository;
+        this.appUserRepository = appUserRepository;
     }
 
 
@@ -34,7 +34,7 @@ public class AuthController {
                     new UsernamePasswordAuthenticationToken(request.getUsername(), request.getPassword())
             );
 
-            User user = userRepository.findByUsername(request.getUsername())
+            AppUser user = appUserRepository.findByUsername(request.getUsername())
                     .orElseThrow(() -> new RuntimeException("Utilisateur non trouvé"));
 
             String jwt = jwtService.generateToken(user);

@@ -1,7 +1,7 @@
 package com.eni.fleetviewer.back.service;
 
-import com.eni.fleetviewer.back.model.User;
-import com.eni.fleetviewer.back.repository.UserRepository;
+import com.eni.fleetviewer.back.model.AppUser;
+import com.eni.fleetviewer.back.repository.AppUserRepository;
 import org.springframework.security.core.authority.SimpleGrantedAuthority;
 import org.springframework.security.core.userdetails.*;
 import org.springframework.stereotype.Service;
@@ -12,16 +12,16 @@ import java.util.List;
 @Service
 public class CustomUserDetailsService implements UserDetailsService {
 
-    private final UserRepository userRepository;
+    private final AppUserRepository appUserRepository;
 
-    public CustomUserDetailsService(UserRepository userRepository) {
-        this.userRepository = userRepository;
+    public CustomUserDetailsService(AppUserRepository appUserRepository) {
+        this.appUserRepository = appUserRepository;
     }
 
     @Override
     public UserDetails loadUserByUsername(String username) throws UsernameNotFoundException {
         // Récupérer l'utilisateur depuis le repository
-        User applicationUser = userRepository.findByUsername(username)
+        AppUser applicationUser = appUserRepository.findByUsername(username)
                 .orElseThrow(() -> new UsernameNotFoundException("Utilisateur non trouvé : " + username));
 
         // Créer une liste d'autorités à partir du rôle de l'utilisateur

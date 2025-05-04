@@ -1,6 +1,6 @@
 package com.eni.fleetviewer.back.service;
 
-import com.eni.fleetviewer.back.model.User;
+import com.eni.fleetviewer.back.model.AppUser;
 import io.jsonwebtoken.JwtException;
 import jakarta.annotation.PostConstruct;
 import org.slf4j.Logger;
@@ -44,7 +44,7 @@ public class JwtService {
      * @param user l'utilisateur pour lequel générer le token
      * @return le token JWT généré
      */
-    public String generateToken(User user) {
+    public String generateToken(AppUser user) {
         Date now = new Date();
         Date expiryDate = new Date(now.getTime() + expirationMs);
 
