@@ -1,19 +1,48 @@
 package com.eni.fleetviewer.back.controller;
 
-import org.springframework.web.bind.annotation.GetMapping;
-import org.springframework.web.bind.annotation.RequestMapping;
-import org.springframework.web.bind.annotation.RestController;
+import com.eni.fleetviewer.back.dto.LoginRequest;
+import com.eni.fleetviewer.back.dto.LoginResponse;
+import com.eni.fleetviewer.back.model.User;
+import com.eni.fleetviewer.back.repository.UserRepository;
+import com.eni.fleetviewer.back.service.JwtService;
+import org.springframework.http.ResponseEntity;
+import org.springframework.security.authentication.*;
+import org.springframework.security.core.AuthenticationException;
+import org.springframework.web.bind.annotation.*;
+import org.springframework.security.authentication.AuthenticationManager;
+
 
 @RestController
-@RequestMapping("/api")
+@RequestMapping("/api/auth")
 public class AuthController {
-    @GetMapping("/public/hello")
-    public String publicEndpoint() {
-        return "Hello, this is a public endpoint!";
+
+    private final AuthenticationManager authenticationManager;
+    private final JwtService jwtService;
+    private final UserRepository userRepository;
+
+    public AuthController(AuthenticationManager authenticationManager, JwtService jwtService, UserRepository userRepository) {
+        this.authenticationManager = authenticationManager;
+        this.jwtService = jwtService;
+        this.userRepository = userRepository;
     }
 
-    @GetMapping("/private/hello")
-    public String privateEndpoint() {
-        return "Hello, this is a private endpoint!";
+
+    @PostMapping("/login")
+    public ResponseEntity<?> login(@RequestBody LoginRequest request) {
+        try {
+            authenticationManager.authenticate(
+                    new UsernamePasswordAuthenticationToken(request.getUsername(), request.getPassword())
+            );
+
+            User user = userRepository.findByUsername(request.getUsername())
+                    .orElseThrow(() -> new RuntimeException("Utilisateur non trouvé"));
+
+            String jwt = jwtService.generateToken(user);
+
+            return ResponseEntity.ok(new LoginResponse(jwt, user.getUsername(), user.getRole()));
+
+        } catch (AuthenticationException e) {
+            return ResponseEntity.status(401).body("Authentification échouée");
+        }
     }
 }

@@ -58,11 +58,23 @@
 			<scope>runtime</scope>
 		</dependency>
 
-		<!-- JWT (v0.12.6 inclut interfaces publiques, implementations internes et support JSON via Jackson) -->
+		<!-- JWT (interfaces publiques, implementations internes et support JSON via Jackson) -->
 		<dependency>
 			<groupId>io.jsonwebtoken</groupId>
 			<artifactId>jjwt-api</artifactId>
 			<version>0.12.6</version>
+		</dependency>
+		<dependency>
+			<groupId>io.jsonwebtoken</groupId>
+			<artifactId>jjwt-impl</artifactId>
+			<version>0.12.6</version>
+			<scope>runtime</scope>
+		</dependency>
+		<dependency>
+			<groupId>io.jsonwebtoken</groupId>
+			<artifactId>jjwt-jackson</artifactId> <!-- ou jjwt-gson -->
+			<version>0.12.6</version>
+			<scope>runtime</scope>
 		</dependency>
 
 		<!-- Lombok (gere les getters et setters) -->
