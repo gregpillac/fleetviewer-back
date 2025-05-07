@@ -13,7 +13,7 @@ import java.time.LocalDateTime;
 @AllArgsConstructor
 @Entity
 @IdClass(ItineraryPointId.class)
-@Table(name = "itinerary_point")
+@Table(name = "itinerary_points")
 public class ItineraryPoint {
 
     // Clé primaire composite définie dans la classe ItineraryPointId

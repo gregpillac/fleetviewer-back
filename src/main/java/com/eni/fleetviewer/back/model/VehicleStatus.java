@@ -18,6 +18,6 @@ public class VehicleStatus {
     private Long id;
 
     @NotNull
-    @Column(nullable = false)
+    @Column(name = "name", nullable = false)
     private String name;
 }

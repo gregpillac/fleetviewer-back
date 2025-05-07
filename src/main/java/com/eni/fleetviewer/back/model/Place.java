@@ -9,7 +9,7 @@ import lombok.*;
 @Setter
 @NoArgsConstructor
 @AllArgsConstructor
-@Table(name = "place")
+@Table(name = "places")
 public class Place {
 
     @Id
@@ -18,7 +18,7 @@ public class Place {
     private Long id;
 
     @NotNull
-    @Column(nullable = false)
+    @Column(name = "name", nullable = false)
     private String name;
 
     @NotNull

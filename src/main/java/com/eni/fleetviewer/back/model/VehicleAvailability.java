@@ -12,9 +12,10 @@ import java.time.LocalDateTime;
 @AllArgsConstructor
 @Entity
 @IdClass(VehicleAvailabilityId.class)
-@Table(name = "vehicle_availability")
+@Table(name = "vehicles_availabilities")
 public class VehicleAvailability {
 
+    // Clé primaire composite définie dans la classe VehicleAvailabilityId
     @Id
     @ManyToOne(fetch = FetchType.LAZY)
     @JoinColumn(name = "vehicle_id")

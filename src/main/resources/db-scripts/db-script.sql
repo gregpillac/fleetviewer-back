@@ -144,8 +144,8 @@ CREATE TABLE vehicle_keys  (
     CONSTRAINT fk_keys_vehicles FOREIGN KEY (vehicle_id) REFERENCES vehicles(vehicle_id)
 );
 
--- Table 'vehicle_availabilities' (Disponibilités du véhicule)
-CREATE TABLE vehicle_availabilities (
+-- Table 'vehicles_availabilities' (Disponibilités des véhicules)
+CREATE TABLE vehicles_availabilities (
     vehicle_id int,
     vehicle_status_id int,
     PRIMARY KEY (vehicle_id, vehicle_status_id),
@@ -171,7 +171,7 @@ CREATE TABLE favorite_places (
     CONSTRAINT fk_favorite_places FOREIGN KEY (place_id) REFERENCES places(place_id)
 );
 
--- Table 'role_authorities' (Permissions par rôles)
+-- Table 'roles_authorities' (Permissions par rôles)
 CREATE TABLE roles_authorities (
     role_id varchar(50),
     authority_id varchar(50),
@@ -186,29 +186,53 @@ ALTER TABLE persons
     ADD COLUMN place_id int,
     ADD CONSTRAINT fk_persons_places FOREIGN KEY (place_id) REFERENCES places(place_id) ON DELETE SET NULL;
 
--- Ajout d'une contrainte CHECK pour vérifier que le lieu associé à une personne est bien de type 'Site'
-ALTER TABLE persons
-    ADD CONSTRAINT chk_persons_places_types
-    CHECK (
-        EXISTS (
-            SELECT 1
-            FROM places
-            JOIN place_types ON places.place_type_id = place_types.place_type_id
-            WHERE places.place_id = persons.place_id
-            AND place_types.name = 'Site'
-        )
-    );
+-- Fonction de vérification : s'assure que le lieu associé à une personne est bien de type 'Site'
+CREATE FUNCTION check_place_type_site_for_person() RETURNS trigger AS $$
+BEGIN
+    IF NEW.place_id IS NOT NULL THEN
+        -- Vérifie si le lieu pointé est bien de type 'Site'
+        PERFORM 1
+        FROM places p
+                 JOIN place_types pt ON p.place_type_id = pt.place_type_id
+        WHERE p.place_id = NEW.place_id AND pt.name = 'Site';
 
--- Ajout d'une contrainte CHECK pour vérifier que le lieu associé à un véhicule est bien de type 'Site'
-ALTER TABLE vehicles
-    ADD CONSTRAINT chk_vehicles_places_types
-    CHECK (
-        EXISTS (
-            SELECT 1
-            FROM places
-            JOIN place_types ON places.place_type_id = place_types.place_type_id
-            WHERE places.place_id = vehicles.place_id
-            AND place_types.name = 'Site'
-        )
-    );
+        -- Si aucun résultat trouvé, on lève une erreur
+        IF NOT FOUND THEN
+            RAISE EXCEPTION 'Le lieu associé à une personne doit être de type "Site"';
+        END IF;
+    END IF;
+    RETURN NEW;
+END;
+$$ LANGUAGE plpgsql;
+
+-- Trigger lié à la table 'persons' : appelé avant chaque INSERT ou UPDATE
+CREATE TRIGGER trg_check_person_place
+    BEFORE INSERT OR UPDATE ON persons
+    FOR EACH ROW
+EXECUTE FUNCTION check_place_type_site_for_person();
+
+-- Fonction de vérification : s'assure que le lieu associé à un véhicule est bien de type 'Site'
+CREATE FUNCTION check_place_type_site_for_vehicle() RETURNS trigger AS $$
+BEGIN
+    IF NEW.place_id IS NOT NULL THEN
+        -- Vérifie si le lieu pointé est bien de type 'Site'
+        PERFORM 1
+        FROM places p
+                 JOIN place_types pt ON p.place_type_id = pt.place_type_id
+        WHERE p.place_id = NEW.place_id AND pt.name = 'Site';
+
+        -- Si aucun résultat trouvé, on lève une erreur
+        IF NOT FOUND THEN
+            RAISE EXCEPTION 'Le lieu associé à un véhicule doit être de type "Site"';
+        END IF;
+    END IF;
+    RETURN NEW;
+END;
+$$ LANGUAGE plpgsql;
+
+-- Trigger lié à la table 'vehicles' : appelé avant chaque INSERT ou UPDATE
+CREATE TRIGGER trg_check_vehicle_place
+    BEFORE INSERT OR UPDATE ON vehicles
+    FOR EACH ROW
+EXECUTE FUNCTION check_place_type_site_for_vehicle();
 

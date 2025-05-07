@@ -9,7 +9,7 @@ import lombok.*;
 @Setter
 @NoArgsConstructor
 @AllArgsConstructor
-@Table(name = "place_type")
+@Table(name = "place_types")
 public class PlaceType {
 
     @Id

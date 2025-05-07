@@ -11,7 +11,7 @@ import lombok.*;
 @AllArgsConstructor
 @Entity
 @IdClass(FavoritePlaceId.class)
-@Table(name = "favorite_place")
+@Table(name = "favorite_places")
 public class FavoritePlace {
 
     // Clé primaire composite définie dans la classe FavoritePlaceId

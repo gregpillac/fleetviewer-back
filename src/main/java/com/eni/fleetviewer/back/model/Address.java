@@ -10,7 +10,7 @@ import lombok.*;
 @NoArgsConstructor
 @AllArgsConstructor
 @Entity
-@Table(name = "address")
+@Table(name = "addresses")
 public class Address {
 
     @Id
@@ -30,7 +30,7 @@ public class Address {
     private String postalCode;
 
     @NotNull
-    @Column(nullable = false)
+    @Column(name = "city", nullable = false)
     private String city;
 
     @Column(name = "gps_coords")

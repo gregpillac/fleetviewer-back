@@ -9,7 +9,7 @@ import lombok.*;
 @NoArgsConstructor
 @AllArgsConstructor
 @Entity
-@Table(name = "document_type")
+@Table(name = "document_types")
 public class DocumentType {
 
     @Id
@@ -18,6 +18,6 @@ public class DocumentType {
     private Long id;
 
     @NotNull
-    @Column(nullable = false)
+    @Column(name = "name", nullable = false)
     private String name;
 }

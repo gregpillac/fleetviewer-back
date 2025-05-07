@@ -1,10 +1,16 @@
 package com.eni.fleetviewer.back.model;
 
 import jakarta.persistence.*;
+import jakarta.validation.constraints.NotNull;
+import lombok.AllArgsConstructor;
 import lombok.Getter;
+import lombok.NoArgsConstructor;
 import lombok.Setter;
 
 @Getter
+@Setter
+@NoArgsConstructor
+@AllArgsConstructor
 @Entity
 @Table(name = "app_users")
 public class AppUser {
@@ -14,28 +20,25 @@ public class AppUser {
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     private Long id;
 
-    @Setter
-    @Column(length = 50)
+    @NotNull
+    @Column(length = 50, nullable = false)
     private String username;
 
-    @Setter
+    @NotNull
+    @Column(nullable = false)
     private String password;
 
-    @Setter
-    @Column(name = "role_id", length = 50)
-    private String role;
-
-    @Setter
+    @NotNull
+    @Column(nullable = false)
     private boolean enabled;
 
-    // Constructeur vide obligatoire, Getters, setters géré par Lombok
-    public AppUser() {}
+    @ManyToOne(fetch = FetchType.LAZY)
+    @NotNull
+    @JoinColumn(name = "role_id", nullable = false)
+    private Role role;
 
-    public AppUser(String username, String password, String role, boolean enabled) {
-        this.username = username;
-        this.password = password;
-        this.role = role;
-        this.enabled = enabled;
-    }
-
+    @ManyToOne(fetch = FetchType.LAZY)
+    @NotNull
+    @JoinColumn(name = "person_id", nullable = false)
+    private Person person;
 }

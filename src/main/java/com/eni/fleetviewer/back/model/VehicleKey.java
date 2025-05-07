@@ -8,7 +8,7 @@ import lombok.*;
 @NoArgsConstructor
 @AllArgsConstructor
 @Entity
-@Table(name = "vehicle_key")
+@Table(name = "vehicle_keys")
 public class VehicleKey {
 
     @Id

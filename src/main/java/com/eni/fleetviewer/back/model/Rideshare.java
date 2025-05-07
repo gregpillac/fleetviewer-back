@@ -11,9 +11,10 @@ import lombok.*;
 @AllArgsConstructor
 @Entity
 @IdClass(RideshareId.class)
-@Table(name = "rideshare")
+@Table(name = "rideshares")
 public class Rideshare {
 
+    // Clé primaire composite définie dans la classe RideshareId
     @Id
     @ManyToOne(fetch = FetchType.LAZY)
     @JoinColumn(name = "person_id")

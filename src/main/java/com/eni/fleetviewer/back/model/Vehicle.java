@@ -9,7 +9,7 @@ import lombok.*;
 @NoArgsConstructor
 @AllArgsConstructor
 @Entity
-@Table(name = "vehicle")
+@Table(name = "vehicles")
 public class Vehicle {
 
     @Id
@@ -22,19 +22,19 @@ public class Vehicle {
     private String licensePlate;
 
     @NotNull
-    @Column(nullable = false)
+    @Column(name = "brand", nullable = false)
     private String brand;
 
     @NotNull
-    @Column(nullable = false)
+    @Column(name = "model", nullable = false)
     private String model;
 
     @NotNull
-    @Column(nullable = false)
+    @Column(name = "seats", nullable = false)
     private Integer seats;
 
     @NotNull
-    @Column(nullable = false)
+    @Column(name = "mileage", nullable = false)
     private Integer mileage;
 
     @NotNull
