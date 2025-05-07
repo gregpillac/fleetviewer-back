@@ -1,184 +1,214 @@
--- Table 'addresses' (Adresse)
+-- Table 'addresses' (Adresses)
 create table addresses (
-    address_id serial primary key,
-    address_line_1 varchar(100), -- rue
+    address_id SERIAL PRIMARY KEY,
+    address_line_1 varchar(100) NOT NULL, -- rue
     address_line_2 varchar(100), -- complément
-    postal_code varchar(10),
-    city varchar(50),
+    postal_code varchar(10)  NOT NULL,
+    city varchar(50)  NOT NULL,
     gps_coords jsonb
 );
 
 -- Table 'place_types' (types de Lieu)
 create table place_types (
-    place_type_id serial primary key,
-    name varchar(80)
+    place_type_id SERIAL PRIMARY KEY,
+    name varchar(80) NOT NULL
 );
 
 -- Table 'vehicle_status' (statuts de Véhicule)
-create table vehicle_status (
-    vehicle_status_id serial primary key,
-    name varchar(50)
+CREATE TABLE vehicle_status (
+    vehicle_status_id SERIAL PRIMARY KEY,
+    name varchar(50) NOT NULL
 );
 
 -- Table 'reservation_status' (statuts de Réservation)
-create table reservation_status (
-    reservation_status_id serial primary key,
-    name varchar(50)
+CREATE TABLE reservation_status (
+    reservation_status_id SERIAL PRIMARY KEY,
+    name varchar(50) NOT NULL
 );
 
 -- Table 'document_type' (types de Document)
-create table document_types (
-    document_type_id serial primary key,
-    name varchar(50)
+CREATE TABLE document_types (
+    document_type_id SERIAL PRIMARY KEY,
+    name varchar(50) NOT NULL
 );
 
 -- Table 'authorities' (Permissions selon Spring Security)
-create table authorities (
-    authority_id varchar(50) primary key,
+CREATE TABLE authorities (
+    authority_id varchar(80) PRIMARY KEY,
     description varchar(255)
 );
 
 -- Table 'roles' (Rôles)
-create table roles (
-    role_id varchar(50) primary key,
+CREATE TABLE roles (
+    role_id varchar(50) PRIMARY KEY,
     description varchar(255)
 );
 
 -- Table 'persons' (Personnes)
-create table persons (
-    person_id serial primary key,
-    first_name varchar(60),
-    last_name varchar(80),
+CREATE TABLE persons (
+    person_id SERIAL PRIMARY KEY,
+    first_name varchar(60) NOT NULL,
+    last_name varchar(80) NOT NULL,
     email varchar(100),
     phone varchar(20),
     address_id int,
-    constraint fk_person_address foreign key (address_id) references addresses(address_id)
+    CONSTRAINT fk_person_address FOREIGN KEY (address_id) REFERENCES addresses(address_id)
 );
 
--- Table 'place' (Lieu)
-create table places (
-    place_id serial primary key,
-    name varchar(100),
-    is_public boolean,
-    place_type_id int,
-    person_id int,
-    address_id int,
-    constraint fk_place_type foreign key (place_type_id) references place_types(place_type_id),
-    constraint fk_place_person foreign key (person_id) references persons(person_id) on delete set null,
-    constraint fk_place_address foreign key (address_id) references addresses(address_id)
+-- Table 'places' (Lieux)
+CREATE TABLE places (
+    place_id SERIAL PRIMARY KEY,
+    name varchar(100) NOT NULL,
+    is_public boolean NOT NULL,
+    place_type_id int NOT NULL,
+    person_id int, -- créé par
+    address_id int NOT NULL,
+    CONSTRAINT fk_places_types FOREIGN KEY (place_type_id) REFERENCES place_types(place_type_id),
+    CONSTRAINT fk_places_persons FOREIGN KEY (person_id) REFERENCES persons(person_id) ON DELETE SET NULL,
+    CONSTRAINT fk_places_addresses FOREIGN KEY (address_id) REFERENCES addresses(address_id)
 );
 
--- Ajout de la référence vers le lieu dans 'person' (nullable pour éviter tout problème de référence circulaire)
-alter table persons
-    add column place_id int,
-    add constraint fk_person_place foreign key (place_id) references places(place_id) on delete set null;
 
--- Table 'vehicle' (Véhicule)
-create table vehicles (
-    vehicle_id serial primary key,
-    license_plate varchar(50),
-    brand varchar(50),
-    model varchar(50),
-    seats int,
-    mileage int,
-    is_roadworthy boolean,
-    is_insurance_valid boolean,
-    place_id int not null,
-    constraint fk_vehicle_place foreign key (place_id) references places(place_id)
+-- Table 'vehicles' (Véhicules)
+CREATE TABLE vehicles (
+    vehicle_id SERIAL PRIMARY KEY,
+    license_plate varchar(50) NOT NULL,
+    brand varchar(50) NOT NULL,
+    model varchar(50) NOT NULL,
+    seats int NOT NULL,
+    mileage int NOT NULL,
+    is_roadworthy boolean NOT NULL,
+    is_insurance_valid boolean NOT NULL,
+    place_id int NOT NULL,
+    CONSTRAINT fk_vehicles_places FOREIGN KEY (place_id) REFERENCES places(place_id)
 );
 
--- Table 'app_users' (Utilisateur)
-create table app_users (
-    user_id serial primary key,
-    username varchar(50),
-    password varchar(255),
-    enabled boolean default true,
-    role_id varchar(50),
-    person_id int,
-    constraint fk_user_role foreign key (role_id) references roles(role_id),
-    constraint fk_user_person foreign key (person_id) references persons(person_id)
+-- Table 'app_users' (Utilisateurs)
+CREATE TABLE app_users (
+    user_id SERIAL PRIMARY KEY,
+    username varchar(50) NOT NULL,
+    password varchar(255) NOT NULL,
+    enabled boolean DEFAULT true NOT NULL,
+    role_id varchar(50) NOT NULL,
+    person_id int NOT NULL,
+    CONSTRAINT fk_users_roles FOREIGN KEY (role_id) REFERENCES roles(role_id),
+    CONSTRAINT fk_users_persons FOREIGN KEY (person_id) REFERENCES persons(person_id)
 );
 
--- Table 'reservation' (Réservation)
-create table reservations (
-    reservation_id serial primary key,
-    reservation_date timestamp,
-    reservation_status_id int,
-    vehicle_id int,
-    person_id int,
-    constraint fk_reservation_status foreign key (reservation_status_id) references reservation_status(reservation_status_id),
-    constraint fk_reservation_vehicle foreign key (vehicle_id) references vehicles(vehicle_id),
-    constraint fk_reservation_person foreign key (person_id) references persons(person_id)
+-- Table 'reservations' (Réservations)
+CREATE TABLE reservations (
+    reservation_id SERIAL PRIMARY KEY,
+    reservation_date timestamp NOT NULL,
+    reservation_status_id int NOT NULL,
+    vehicle_id int NOT NULL,
+    person_id int NOT NULL,
+    CONSTRAINT fk_reservations_status FOREIGN KEY (reservation_status_id) REFERENCES reservation_status(reservation_status_id),
+    CONSTRAINT fk_reservations_vehicles FOREIGN KEY (vehicle_id) REFERENCES vehicles(vehicle_id),
+    CONSTRAINT fk_reservations_persons FOREIGN KEY (person_id) REFERENCES persons(person_id)
 );
 
--- Table 'document' (Document)
-create table documents (
-    document_id serial primary key,
+-- Table 'documents' (Documents)
+CREATE TABLE documents (
+    document_id SERIAL PRIMARY KEY,
     valid_until date,
-    document_type_id int not null,
+    document_type_id int NOT NULL,
     vehicle_id int,
     person_id int,
-    constraint fk_document_type foreign key (document_type_id) references document_types(document_type_id),
-    constraint fk_document_vehicle foreign key (vehicle_id) references vehicles(vehicle_id),
-    constraint fk_document_person foreign key (person_id) references persons(person_id),
-    constraint chk_document_target check ( -- Document lié soit à un Véhicule soit à une Personne
-        (vehicle_id is not null and person_id is null) or
-        (vehicle_id is null and person_id is not null)
+    CONSTRAINT fk_documents_types FOREIGN KEY (document_type_id) REFERENCES document_types(document_type_id),
+    CONSTRAINT fk_documents_vehicles FOREIGN KEY (vehicle_id) REFERENCES vehicles(vehicle_id),
+    CONSTRAINT fk_documents_persons FOREIGN KEY (person_id) REFERENCES persons(person_id),
+    -- Document lié soit à un Véhicule soit à une Personne
+    CONSTRAINT chk_documents_target CHECK (
+        (vehicle_id IS NOT NULL AND person_id IS NULL) OR
+        (vehicle_id IS NULL AND person_id IS NOT NULL)
     )
 );
 
--- Table 'itinerary_point' (Point d'itinéraire)
-create table itinerary_points (
+-- Table 'itinerary_points' (Points d'itinéraire)
+CREATE TABLE itinerary_points (
     reservation_id int,
     place_id int,
-    date_time timestamp,
-    point_type varchar(50),
-    primary key (reservation_id, place_id),
-    constraint fk_itinerary_reservation foreign key (reservation_id) references reservations(reservation_id),
-    constraint fk_itinerary_place foreign key (place_id) references places(place_id)
+    date_time timestamp NOT NULL,
+    point_type varchar(50) NOT NULL,
+    PRIMARY KEY (reservation_id, place_id),
+    CONSTRAINT fk_itinerary_reservations FOREIGN KEY (reservation_id) REFERENCES reservations(reservation_id),
+    CONSTRAINT fk_itinerary_places FOREIGN KEY (place_id) REFERENCES places(place_id)
 );
 
--- Table 'vehicle_keys' (Clé de Véhicule)
-create table vehicle_keys  (
-    vehicle_key_id serial primary key,
+-- Table 'vehicle_keys' (Clés de Véhicule)
+CREATE TABLE vehicle_keys  (
+    vehicle_key_id SERIAL PRIMARY KEY,
     place_id int,
     vehicle_id int,
-    constraint fk_key_place foreign key (place_id) references places(place_id),
-    constraint fk_key_vehicle foreign key (vehicle_id) references vehicles(vehicle_id)
+    CONSTRAINT fk_keys_places FOREIGN KEY (place_id) REFERENCES places(place_id),
+    CONSTRAINT fk_keys_vehicles FOREIGN KEY (vehicle_id) REFERENCES vehicles(vehicle_id)
 );
 
--- Table 'vehicle_availability' (Disponibilité du véhicule)
-create table vehicle_availability (
+-- Table 'vehicle_availabilities' (Disponibilités du véhicule)
+CREATE TABLE vehicle_availabilities (
     vehicle_id int,
     vehicle_status_id int,
-    primary key (vehicle_id, vehicle_status_id),
-    constraint fk_availability_vehicle foreign key (vehicle_id) references vehicles(vehicle_id),
-    constraint fk_availability_status foreign key (vehicle_status_id) references vehicle_status(vehicle_status_id)
+    PRIMARY KEY (vehicle_id, vehicle_status_id),
+    CONSTRAINT fk_availabilities_vehicles FOREIGN KEY (vehicle_id) REFERENCES vehicles(vehicle_id),
+    CONSTRAINT fk_availabilities_status FOREIGN KEY (vehicle_status_id) REFERENCES vehicle_status(vehicle_status_id)
 );
 
 -- Table 'rideshares' (Covoiturages)
-create table rideshares (
+CREATE TABLE rideshares (
     person_id int,
     reservation_id int,
-    primary key (person_id, reservation_id),
-    constraint fk_rideshare_person foreign key (person_id) references persons(person_id),
-    constraint fk_rideshare_reservation foreign key (reservation_id) references reservations(reservation_id)
+    PRIMARY KEY (person_id, reservation_id),
+    CONSTRAINT fk_rideshares_persons FOREIGN KEY (person_id) REFERENCES persons(person_id),
+    CONSTRAINT fk_rideshares_reservations FOREIGN KEY (reservation_id) REFERENCES reservations(reservation_id)
 );
 
 -- Table 'favorite_places' (Lieux favoris)
-create table favorite_places (
+CREATE TABLE favorite_places (
     person_id int,
     place_id int,
-    primary key (person_id, place_id),
-    constraint fk_favorite_person foreign key (person_id) references persons(person_id),
-    constraint fk_favorite_place foreign key (place_id) references places(place_id)
+    PRIMARY KEY (person_id, place_id),
+    CONSTRAINT fk_favorite_persons FOREIGN KEY (person_id) REFERENCES persons(person_id),
+    CONSTRAINT fk_favorite_places FOREIGN KEY (place_id) REFERENCES places(place_id)
 );
 
--- Table 'role_authority' (Permissions par rôle)
-create table roles_authorities (
+-- Table 'role_authorities' (Permissions par rôles)
+CREATE TABLE roles_authorities (
     role_id varchar(50),
     authority_id varchar(50),
-    primary key (role_id, authority_id),
-    constraint fk_role_authority_role foreign key (role_id) references roles(role_id),
-    constraint fk_role_authority_authority foreign key (authority_id) references authorities(authority_id)
+    PRIMARY KEY (role_id, authority_id),
+    CONSTRAINT fk_authorities_roles FOREIGN KEY (role_id) REFERENCES roles(role_id),
+    CONSTRAINT fk_roles_authorities FOREIGN KEY (authority_id) REFERENCES authorities(authority_id)
 );
+
+
+-- Ajout de la référence vers le lieu dans 'persons' (nullable pour éviter tout problème de référence circulaire)
+ALTER TABLE persons
+    ADD COLUMN place_id int,
+    ADD CONSTRAINT fk_persons_places FOREIGN KEY (place_id) REFERENCES places(place_id) ON DELETE SET NULL;
+
+-- Ajout d'une contrainte CHECK pour vérifier que le lieu associé à une personne est bien de type 'Site'
+ALTER TABLE persons
+    ADD CONSTRAINT chk_persons_places_types
+    CHECK (
+        EXISTS (
+            SELECT 1
+            FROM places
+            JOIN place_types ON places.place_type_id = place_types.place_type_id
+            WHERE places.place_id = persons.place_id
+            AND place_types.name = 'Site'
+        )
+    );
+
+-- Ajout d'une contrainte CHECK pour vérifier que le lieu associé à un véhicule est bien de type 'Site'
+ALTER TABLE vehicles
+    ADD CONSTRAINT chk_vehicles_places_types
+    CHECK (
+        EXISTS (
+            SELECT 1
+            FROM places
+            JOIN place_types ON places.place_type_id = place_types.place_type_id
+            WHERE places.place_id = vehicles.place_id
+            AND place_types.name = 'Site'
+        )
+    );
+
