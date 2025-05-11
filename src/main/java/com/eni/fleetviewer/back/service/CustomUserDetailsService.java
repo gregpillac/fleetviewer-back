@@ -30,7 +30,7 @@ public class CustomUserDetailsService implements UserDetailsService {
         // TODO: implementer une méthode pour préfixer avec ROLE_ ou desactiver cette contrainte pour ne pas contraindre la BDD
         // Créez les autorités/rôles correctement
         List<SimpleGrantedAuthority> authorities = Collections.singletonList(
-                new SimpleGrantedAuthority(applicationUser.getRole()) // Utilisation du rôle stocké en BDD
+                new SimpleGrantedAuthority(applicationUser.getRoleName()) // Utilisation du rôle stocké en BDD
                 // TODO: Recuperer via JPA les autorithies associées aux roles dans un 2nd temps
         );
 

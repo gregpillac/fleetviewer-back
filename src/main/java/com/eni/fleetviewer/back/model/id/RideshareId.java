@@ -10,6 +10,6 @@ import java.io.Serializable;
 @NoArgsConstructor
 @AllArgsConstructor
 public class RideshareId implements Serializable {
-    private Long personId;
-    private Long reservationId;
+    private Long person;
+    private Long reservation;
 }

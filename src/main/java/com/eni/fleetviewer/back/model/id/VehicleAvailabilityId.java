@@ -14,6 +14,6 @@ import java.io.Serializable;
 @AllArgsConstructor
 public class VehicleAvailabilityId implements Serializable {
 
-    private Long vehicleId;
-    private Long vehicleStatusId;
+    private Long vehicle;
+    private Long vehicleStatus;
 }

@@ -41,4 +41,13 @@ public class AppUser {
     @NotNull
     @JoinColumn(name = "person_id", nullable = false)
     private Person person;
+
+    public String getRoleName() {
+        if (this.role != null) {
+            return this.role.getId();
+        }
+        return "Aucun rôle";
+    }
 }
+
+

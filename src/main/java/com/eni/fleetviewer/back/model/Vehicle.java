@@ -35,7 +35,7 @@ public class Vehicle {
 
     @NotNull
     @Column(name = "mileage", nullable = false)
-    private Integer mileage;
+    private Long mileage;
 
     @NotNull
     @Column(name = "is_roadworthy", nullable = false)

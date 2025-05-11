@@ -14,6 +14,6 @@ import java.io.Serializable;
 @AllArgsConstructor
 public class RoleAuthorityId implements Serializable {
 
-    private Long roleId;
-    private Long authorityId;
+    private String role;
+    private String authority;
 }

@@ -11,6 +11,6 @@ import java.io.Serializable;
 @AllArgsConstructor
 public class FavoritePlaceId implements Serializable {
 
-    private Long personId;
-    private Long placeId;
+    private Long person;
+    private Long place;
 }

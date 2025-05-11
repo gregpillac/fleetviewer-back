@@ -33,6 +33,6 @@ public class Address {
     @Column(name = "city", nullable = false)
     private String city;
 
-    @Column(name = "gps_coords")
+    @Column(name = "gps_coords", columnDefinition = "JSON")
     private String gpsCoords;
 }

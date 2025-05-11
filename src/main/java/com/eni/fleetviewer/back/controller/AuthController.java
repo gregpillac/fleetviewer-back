@@ -39,7 +39,7 @@ public class AuthController {
 
             String jwt = jwtService.generateToken(user);
 
-            return ResponseEntity.ok(new LoginResponse(jwt, user.getUsername(), user.getRole()));
+            return ResponseEntity.ok(new LoginResponse(jwt, user.getUsername(), user.getRoleName()));
 
         } catch (AuthenticationException e) {
             return ResponseEntity.status(401).body("Authentification échouée");

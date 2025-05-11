@@ -13,6 +13,6 @@ import java.io.Serializable;
 @EqualsAndHashCode
 public class ItineraryPointId implements Serializable {
 
-    private Long reservationId;
-    private Long placeId;
+    private Long reservation;
+    private Long place;
 }
