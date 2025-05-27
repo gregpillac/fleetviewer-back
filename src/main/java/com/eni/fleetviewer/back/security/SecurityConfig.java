@@ -41,6 +41,7 @@ public class SecurityConfig {
                 // Règles d'autorisation
                 .authorizeHttpRequests(auth -> auth
                         .requestMatchers("/api/auth/**").permitAll()
+                        .requestMatchers("/users").permitAll() // Test
                         .anyRequest().authenticated()
                 )
                 .authenticationProvider(authenticationProvider())
@@ -65,5 +66,4 @@ public class SecurityConfig {
     public PasswordEncoder passwordEncoder() {
         return new BCryptPasswordEncoder();
     }
-
 }
