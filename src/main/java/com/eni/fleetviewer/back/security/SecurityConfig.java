@@ -41,7 +41,7 @@ public class SecurityConfig {
                 // Règles d'autorisation
                 .authorizeHttpRequests(auth -> auth
                         .requestMatchers("/api/auth/**").permitAll()
-                        .requestMatchers("/users").permitAll() // Test
+                        .requestMatchers("/users").hasRole("ADMIN")
                         .anyRequest().authenticated()
                 )
                 .authenticationProvider(authenticationProvider())
