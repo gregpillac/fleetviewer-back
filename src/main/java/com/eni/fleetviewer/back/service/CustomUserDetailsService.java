@@ -24,18 +24,22 @@ public class CustomUserDetailsService implements UserDetailsService {
         AppUser applicationUser = appUserRepository.findByUsername(username)
                 .orElseThrow(() -> new UsernameNotFoundException("Utilisateur non trouvé : " + username));
 
-        // Créer une liste d'autorités à partir du rôle de l'utilisateur
-        // Dans Spring Security, les autorités sont les permissions granulaires
-        // Les rôles sont généralement préfixés par "ROLE_", mais comme la BD a déjà ce préfixe, on l'utilise directement comme une autorité
-        // TODO: implementer une méthode pour préfixer avec ROLE_ ou desactiver cette contrainte pour ne pas contraindre la BDD
-        // Créez les autorités/rôles correctement
+        /**
+         * Créer une liste d'autorités à partir du rôle de l'utilisateur
+         * Dans Spring Security, les autorités sont les permissions granulaires
+         * Les rôles sont généralement préfixés par "ROLE_", mais comme la BD a déjà ce préfixe, on l'utilise directement comme une autorité
+         *  TODO: implementer une méthode pour préfixer avec ROLE_ ou desactiver cette contrainte pour ne pas contraindre la BDD
+         * Ici, on utilise le rôle de l'utilisateur pour créer une autorité
+         * Si on a plusieurs rôles ou autorités, on peut les ajouter à la liste
+         *  TODO: Créez les autorités / rôles correctement
+         */
         List<SimpleGrantedAuthority> authorities = Collections.singletonList(
                 new SimpleGrantedAuthority(applicationUser.getRole()) // Utilisation du rôle stocké en BDD
                 // TODO: Recuperer via JPA les autorithies associées aux roles dans un 2nd temps
         );
 
         // Créer et retourner un objet UserDetails de Spring Security
-        return new org.springframework.security.core.userdetails.User(
+        return new User(
             applicationUser.getUsername(),  // Nom d'utilisateur
             applicationUser.getPassword(),  // Mot de passe hashé
             applicationUser.isEnabled(),    // Compte activé

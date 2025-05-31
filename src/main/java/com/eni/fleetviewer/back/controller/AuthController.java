@@ -8,6 +8,7 @@ import io.jsonwebtoken.Claims;
 import jakarta.servlet.http.Cookie;
 import jakarta.servlet.http.HttpServletRequest;
 import jakarta.servlet.http.HttpServletResponse;
+import org.springframework.beans.factory.annotation.Value;
 import org.springframework.http.HttpHeaders;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseCookie;
@@ -26,6 +27,8 @@ public class AuthController {
 
     private final AuthService authService;
     private final JwtService jwtService;
+    @Value("${app.cookie.domain}")
+    private String cookieDomain;
 
     /**
      * Contrôleur gérant l'Authentification des utilisateurs via un nom d'utilisateur et un mot de passe
@@ -48,6 +51,7 @@ public class AuthController {
                 .httpOnly(true)
                 .secure(true)
                 .path("/")
+                .domain(cookieDomain)  // Ajout du domaine
                 .maxAge(24 * 60 * 60)
                 .sameSite("Strict")
                 .build();
@@ -91,6 +95,7 @@ public class AuthController {
                 .httpOnly(true)
                 .secure(true)
                 .path("/")
+                .domain(cookieDomain)  // Ajout du domaine
                 .maxAge(0)
                 .build();
 
