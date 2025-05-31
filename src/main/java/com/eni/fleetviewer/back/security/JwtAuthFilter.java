@@ -4,6 +4,7 @@ import com.eni.fleetviewer.back.service.CustomUserDetailsService;
 import com.eni.fleetviewer.back.service.JwtService;
 import jakarta.servlet.*;
 import jakarta.servlet.http.HttpServletRequest;
+import jakarta.servlet.http.Cookie;
 import org.springframework.security.authentication.UsernamePasswordAuthenticationToken;
 import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.security.web.authentication.WebAuthenticationDetailsSource;
@@ -23,12 +24,18 @@ public class JwtAuthFilter extends GenericFilter {
         this.userDetailsService = userDetailsService;
     }
 
+    /**
+     * Filtre pour valider le token JWT dans les requêtes entrantes.
+     * Le token est extrait des cookies et validé.
+     * Si valide, l'authentification est mise à jour dans le contexte de sécurité.
+     */
     @Override
     public void doFilter(ServletRequest request, ServletResponse response, FilterChain chain)
             throws IOException, ServletException {
 
         HttpServletRequest httpRequest = (HttpServletRequest) request;
-        String token = extractToken(httpRequest);
+        // Extraction du token depuis les cookies au lieu de l'en-tête Authorization
+        String token = extractTokenFromCookie(httpRequest);
 
         if (StringUtils.hasText(token)) {
             String username = jwtService.extractUsername(token);
@@ -36,7 +43,7 @@ public class JwtAuthFilter extends GenericFilter {
             if (username != null && SecurityContextHolder.getContext().getAuthentication() == null) {
                 var userDetails = userDetailsService.loadUserByUsername(username);
 
-                if (jwtService.isTokenValid(token, username)) {
+                if (jwtService.isTokenValid(token)) {
                     var authToken = new UsernamePasswordAuthenticationToken(
                             userDetails, null, userDetails.getAuthorities());
 
@@ -48,10 +55,19 @@ public class JwtAuthFilter extends GenericFilter {
         chain.doFilter(request, response);
     }
 
-    private String extractToken(HttpServletRequest request) {
-        String authHeader = request.getHeader("Authorization");
-        if (StringUtils.hasText(authHeader) && authHeader.startsWith("Bearer ")) {
-            return authHeader.substring(7); // Remove "Bearer "
+    /**
+     * Extrait le token JWT depuis les cookies de la requête HTTP.
+     * @param request La requête HTTP contenant les cookies.
+     * @return Le token JWT s'il est trouvé, sinon null.
+     */
+    private String extractTokenFromCookie(HttpServletRequest request) {
+        Cookie[] cookies = request.getCookies();
+        if (cookies != null) {
+            for (Cookie cookie : cookies) {
+                if (cookie.getName().equals("JWT_TOKEN")) {
+                    return cookie.getValue();
+                }
+            }
         }
         return null;
     }
