@@ -1,18 +1,23 @@
 package com.eni.fleetviewer.back.service;
 
-import com.eni.fleetviewer.back.model.AppUser;
 import io.jsonwebtoken.JwtException;
 import jakarta.annotation.PostConstruct;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Value;
+import org.springframework.security.core.Authentication;
+import org.springframework.security.core.userdetails.UserDetails;
+import org.springframework.security.core.GrantedAuthority;
 import org.springframework.stereotype.Service;
 import io.jsonwebtoken.Jwts;
 import io.jsonwebtoken.security.Keys;
 import io.jsonwebtoken.Claims;
-
+import java.util.List;
+import java.util.Arrays;
+import java.util.Collections;
 import javax.crypto.SecretKey;
 import java.util.Date;
+import java.util.stream.Collectors;
 
 @Service
 public class JwtService {
@@ -41,25 +46,22 @@ public class JwtService {
 
     /**
      * Génère un token JWT pour un utilisateur
-     * @param user l'utilisateur pour lequel générer le token
      * @return le token JWT généré
      */
-    public String generateToken(AppUser user) {
+    public String generateToken(Authentication authentication) {
+        UserDetails userDetails = (UserDetails) authentication.getPrincipal();
         Date now = new Date();
         Date expiryDate = new Date(now.getTime() + expirationMs);
 
-        try {
-            return Jwts.builder()
-                .subject(user.getUsername())
-                .claim("roles", user.getRole())
+        return Jwts.builder()
+                .subject(userDetails.getUsername())
+                .claim("roles", userDetails.getAuthorities().stream()
+                        .map(GrantedAuthority::getAuthority)
+                        .collect(Collectors.joining(",")))
                 .issuedAt(now)
                 .expiration(expiryDate)
                 .signWith(secretKey)
                 .compact();
-        } catch (Exception e) {
-            logger.error("Erreur lors de la génération du token JWT", e);
-            throw new RuntimeException("Impossible de générer le token JWT", e);
-        }
     }
 
     /**
@@ -82,24 +84,28 @@ public class JwtService {
     }
 
     /**
-     * @param token le token à vérifier
-     * @param expectedUsername le nom d'utilisateur attendu
-     * @return true si le token est valide, false sinon
+     * Extrait les rôles de l'utilisateur depuis un token JWT
+     * @param token le token JWT
+     * @return la liste des rôles de l'utilisateur
      */
-    public boolean isTokenValid(String token, String expectedUsername) {
+    public List<String> extractRoles(String token) {
+        Claims claims = extractAllClaims(token);
+        if (claims == null) return Collections.emptyList();
+        String roles = claims.get("roles", String.class);
+        return roles != null ? Arrays.asList(roles.split(",")) : Collections.emptyList();
+    }
+
+
+    /**
+     * @param token le token à vérifier
+     * @return true si le token est valide et non expiré, false sinon
+     */
+    public boolean isTokenValid(String token) {
         try {
-            Claims claims = Jwts.parser()
-                    .verifyWith(secretKey)
-                    .build()
-                    .parseSignedClaims(token)
-                    .getPayload();
-
-            String username = claims.getSubject();
-            Date expiration = claims.getExpiration();
-
-            return (username.equals(expectedUsername) && !expiration.before(new Date()));
+            Claims claims = extractAllClaims(token);
+            return claims != null && !claims.getExpiration().before(new Date());
         } catch (Exception e) {
-            logger.error("Erreur lors de la validation du token JWT", e);
+            logger.error("Erreur JWT : {}", e.getMessage());
             return false;
         }
     }
