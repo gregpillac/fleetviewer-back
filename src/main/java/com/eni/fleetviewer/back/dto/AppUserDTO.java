@@ -15,13 +15,15 @@ public class AppUserDTO {
     private String username;
     private boolean enabled;
     private String role;
-    private String fullName; // exemple avec Person
+    private String firstname;
+    private String lastname;
 
     public AppUserDTO(AppUser user) {
         this.id = user.getId();
         this.username = user.getUsername();
         this.enabled = user.isEnabled();
         this.role = user.getRoleName();
-        this.fullName = user.getPerson().getFirstName() + " " + user.getPerson().getLastName();
+        this.firstname = user.getPerson().getFirstName();
+        this.lastname = user.getPerson().getLastName();
     }
 }
