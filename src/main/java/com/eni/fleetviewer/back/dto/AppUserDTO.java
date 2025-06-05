@@ -1,6 +1,9 @@
 package com.eni.fleetviewer.back.dto;
 
+import com.eni.fleetviewer.back.model.Address;
 import com.eni.fleetviewer.back.model.AppUser;
+import com.eni.fleetviewer.back.model.Person;
+import com.eni.fleetviewer.back.model.Place;
 import lombok.AllArgsConstructor;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
@@ -15,15 +18,15 @@ public class AppUserDTO {
     private String username;
     private boolean enabled;
     private String role;
-    private String firstname;
-    private String lastname;
+    private PersonDTO person;
 
     public AppUserDTO(AppUser user) {
         this.id = user.getId();
         this.username = user.getUsername();
         this.enabled = user.isEnabled();
         this.role = user.getRoleName();
-        this.firstname = user.getPerson().getFirstName();
-        this.lastname = user.getPerson().getLastName();
+        if (user.getPerson() != null) {
+            this.person = new PersonDTO(user.getPerson());
+        }
     }
 }
