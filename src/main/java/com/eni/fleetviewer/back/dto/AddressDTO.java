@@ -26,4 +26,15 @@ public class AddressDTO {
         this.city = address.getCity();
         this.gpsCoords = address.getGpsCoords();
     }
+
+    public Address toEntity() {
+        Address a = new Address();
+        a.setId(this.id);
+        a.setAddressFirstLine(this.addressFirstLine);
+        a.setAddressSecondLine(this.addressSecondLine);
+        a.setPostalCode(this.postalCode);
+        a.setCity(this.city);
+        a.setGpsCoords(this.gpsCoords);
+        return a;
+    }
 }

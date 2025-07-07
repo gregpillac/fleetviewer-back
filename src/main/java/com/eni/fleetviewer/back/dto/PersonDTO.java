@@ -25,11 +25,19 @@ public class PersonDTO {
         this.lastName = person.getLastName();
         this.email = person.getEmail();
         this.phone = person.getPhone();
-        if (person.getAddress() != null) {
-            this.address = new AddressDTO(person.getAddress());
-        }
-        if (person.getPlace() != null) {
-            this.place = new PlaceDTO(person.getPlace());
-        }
+        this.address = person.getAddress() != null ? new AddressDTO(person.getAddress()) : null;
+        this.place = person.getPlace() != null ? new PlaceDTO(person.getPlace()) : null;
+    }
+
+    public Person toEntity() {
+        Person p = new Person();
+        p.setId(this.id);
+        p.setFirstName(this.firstName);
+        p.setLastName(this.lastName);
+        p.setEmail(this.email);
+        p.setPhone(this.phone);
+        p.setAddress(this.address != null ? this.address.toEntity() : null);
+        p.setPlace(this.place != null ? this.place.toEntity() : null);
+        return p;
     }
 }

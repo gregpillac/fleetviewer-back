@@ -20,8 +20,15 @@ public class PlaceDTO {
         this.id = place.getId();
         this.name = place.getName();
         this.isPublic = place.isPublic();
-        if (place.getPlaceType() != null) {
-            this.placeType = new PlaceTypeDTO(place.getPlaceType());
-        }
+        this.placeType = place.getPlaceType() != null ? new PlaceTypeDTO(place.getPlaceType()) : null;
+    }
+
+    public Place toEntity() {
+        Place p = new Place();
+        p.setId(this.id);
+        p.setName(this.name);
+        p.setPublic(this.isPublic);
+        p.setPlaceType(this.placeType != null ? this.placeType.toEntity() : null);
+        return p;
     }
 }

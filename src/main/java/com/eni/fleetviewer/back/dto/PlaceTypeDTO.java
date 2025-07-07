@@ -18,4 +18,11 @@ public class PlaceTypeDTO {
         this.id = placeType.getId();
         this.name = placeType.getName();
     }
+
+    public PlaceType toEntity() {
+        PlaceType pt = new PlaceType();
+        pt.setId(id);
+        pt.setName(name);
+        return pt;
+    }
 }
