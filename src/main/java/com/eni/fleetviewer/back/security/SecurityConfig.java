@@ -49,6 +49,11 @@ public class SecurityConfig {
                         .requestMatchers("/api/auth/**").permitAll()
                         .requestMatchers("/api/users/current").authenticated()
                         .requestMatchers("/api/users/**").hasRole("ADMIN")
+
+                        // === Nouvelle ligne pour protéger /api/vehicles/**
+                        .requestMatchers("/api/vehicles/**")
+                        .hasRole("ADMIN")     // Seuls les ADMIN y auront accès
+
                         .anyRequest().authenticated()
                 )
                 .authenticationProvider(authenticationProvider())

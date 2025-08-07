@@ -1,0 +1,8 @@
+package com.eni.fleetviewer.back.repository;
+
+import com.eni.fleetviewer.back.model.Vehicle;
+import org.springframework.data.jpa.repository.JpaRepository;
+
+public interface VehicleRepository extends JpaRepository<Vehicle, Long> {
+    // JpaRepository fournit déjà : save(), findById(), findAll(), deleteById(), etc.
+}
