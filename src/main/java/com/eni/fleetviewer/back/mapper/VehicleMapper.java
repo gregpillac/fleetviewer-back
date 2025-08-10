@@ -37,7 +37,7 @@ public abstract class VehicleMapper {
     public abstract Vehicle toEntity(VehicleDTO vehicleDTO);
 
     // Méthode personnalisée pour convertir un ID en entité Place
-    protected Place longToPlace(Long placeId) {
+    public Place longToPlace(Long placeId) {
         if (placeId == null) {
             return null;
         }

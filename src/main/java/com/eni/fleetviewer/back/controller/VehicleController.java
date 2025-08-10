@@ -7,6 +7,7 @@ import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 
 import java.net.URI;
+import java.util.List;
 
 @RestController
 @RequestMapping("/api/vehicles")
@@ -18,18 +19,77 @@ public class VehicleController {
         this.vehicleService = vehicleService;
     }
 
+
     /**
-     * POST /api/vehicles
-     * Crée un nouveau véhicule et renvoie 201 Created + DTO.
+     * GET /api/vehicles : Récupère la liste de tous les véhicules.
+     * @return ResponseEntity avec le statut 200 OK et la liste des véhicules dans le corps.
+     */
+    @GetMapping
+    public ResponseEntity<List<VehicleDTO>> getAllVehicles() {
+
+        List<VehicleDTO> vehicles = vehicleService.getAllVehicles();
+        return ResponseEntity.ok(vehicles);
+    }
+
+
+    /**
+     * GET /api/vehicles/{id} : Récupère un véhicule par son identifiant.
+     * @param id L'identifiant du véhicule à récupérer.
+     * @return ResponseEntity avec le statut 200 OK et le véhicule trouvé,
+     * ou 404 Not Found si l'ID n'existe pas (géré par un exception handler).
+     */
+    @GetMapping("/{id}")
+    public ResponseEntity<VehicleDTO> getVehicleById (
+            @PathVariable Long id) {
+
+        VehicleDTO vehicle = vehicleService.getVehicleById(id);
+        return ResponseEntity.ok(vehicle);
+    }
+
+
+    /**
+     * POST /api/vehicles : Crée un nouveau véhicule.
+     * @param dto Le DTO du véhicule à créer, validé à partir du corps de la requête.
+     * @return ResponseEntity avec le statut 201 Created, l'en-tête Location pointant
+     * vers la nouvelle ressource, et le DTO du véhicule créé dans le corps.
      */
     @PostMapping
     public ResponseEntity<VehicleDTO> addVehicle(
-            @Valid @RequestBody VehicleDTO dto) {
+            @Valid @RequestBody VehicleDTO dto){
 
         VehicleDTO created = vehicleService.addVehicle(dto);
-
-        // Location header: /api/vehicles/{id}
+        // Création de l'URI pour l'en-tête Location
         URI location = URI.create("/api/vehicles/" + created.getId());
         return ResponseEntity.created(location).body(created);
+    }
+
+
+    /**
+     * PUT /api/vehicles/{id} : Met à jour un véhicule existant.
+     * @param id L'identifiant du véhicule à mettre à jour.
+     * @param dto Le DTO contenant les nouvelles informations du véhicule.
+     * @return ResponseEntity avec le statut 200 OK et le DTO du véhicule mis à jour.
+     */
+    @PutMapping("/{id}")
+    public ResponseEntity<VehicleDTO> updateVehicle(
+            @PathVariable Long id,
+            @Valid @RequestBody VehicleDTO dto) {
+
+        VehicleDTO updatedVehicle = vehicleService.updateVehicle(id, dto);
+        return ResponseEntity.ok(updatedVehicle);
+    }
+
+
+    /**
+     * DELETE /api/vehicles/{id} : Supprime un véhicule par son identifiant.
+     * @param id L'identifiant du véhicule à supprimer.
+     * @return ResponseEntity avec le statut 204 No Content si la suppression a réussi.
+     */
+    @DeleteMapping("/{id}")
+    public ResponseEntity<Void> deleteVehicleById (
+            @PathVariable Long id) {
+
+        vehicleService.deleteVehicleById(id);
+        return ResponseEntity.noContent().build();
     }
 }
