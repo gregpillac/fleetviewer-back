@@ -1,6 +1,7 @@
 package com.eni.fleetviewer.back.mapper;
 
 import com.eni.fleetviewer.back.dto.VehicleDTO;
+import com.eni.fleetviewer.back.exception.RessourceNotFoundException;
 import com.eni.fleetviewer.back.model.Place;
 import com.eni.fleetviewer.back.model.Vehicle;
 import com.eni.fleetviewer.back.repository.PlaceRepository;
@@ -42,6 +43,6 @@ public abstract class VehicleMapper {
             return null;
         }
         return placeRepository.findById(placeId)
-                .orElseThrow(() -> new IllegalArgumentException("Place introuvable pour l’ID " + placeId));
+                .orElseThrow(() -> new RessourceNotFoundException("Place introuvable pour l’ID " + placeId));
     }
 }

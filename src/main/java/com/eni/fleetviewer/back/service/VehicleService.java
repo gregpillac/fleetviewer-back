@@ -4,6 +4,7 @@ import com.eni.fleetviewer.back.dto.VehicleDTO;
 import com.eni.fleetviewer.back.mapper.VehicleMapper;
 import com.eni.fleetviewer.back.model.Vehicle;
 import com.eni.fleetviewer.back.repository.VehicleRepository;
+import com.eni.fleetviewer.back.exception.RessourceNotFoundException;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 import java.util.List;
@@ -41,7 +42,7 @@ public class VehicleService {
     @Transactional(readOnly = true)
     public VehicleDTO getVehicleById(Long id) {
         Vehicle vehicle = vehicleRepo.findById(id)
-                .orElseThrow(() -> new IllegalArgumentException("Véhicule non trouvé pour l'id " + id));
+                .orElseThrow(() -> new RessourceNotFoundException("Véhicule non trouvé pour l'id " + id));
         return vehicleMapper.toDto(vehicle);
     }
 
@@ -52,7 +53,7 @@ public class VehicleService {
     @Transactional
     public void deleteVehicleById(Long id) {
         if (!vehicleRepo.existsById(id)) {
-            throw new IllegalArgumentException("Véhicule non trouvé pour l'id " + id);
+            throw new RessourceNotFoundException("Véhicule non trouvé pour l'id " + id);
         }
         vehicleRepo.deleteById(id);
     }
@@ -81,7 +82,7 @@ public class VehicleService {
     @Transactional
     public VehicleDTO updateVehicle(Long id, VehicleDTO dto) {
         Vehicle existing = vehicleRepo.findById(id)
-                .orElseThrow(() -> new IllegalArgumentException("Véhicule non trouvé pour l'id " + id));
+                .orElseThrow(() -> new RessourceNotFoundException("Véhicule non trouvé pour l'id " + id));
         // Mise à jour les champs
         existing.setSeats(dto.getSeats());
         existing.setMileage(dto.getMileage());
