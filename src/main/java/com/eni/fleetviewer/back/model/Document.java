@@ -34,17 +34,6 @@ public class Document {
     @JoinColumn(name = "person_id")
     private Person person;
 
-    // Constructeur personnalisé avec validation
-    public Document(LocalDate validUntil, DocumentType documentType, Vehicle vehicle, Person person) {
-        if ((vehicle == null && person == null) || (vehicle != null && person != null)) {
-            throw new IllegalArgumentException("Un document doit être lié soit à un véhicule, soit à une personne, mais pas les deux.");
-        }
-        this.validUntil = validUntil;
-        this.documentType = documentType;
-        this.vehicle = vehicle;
-        this.person = person;
-    }
-
     // Validation automatique avant insertion ou mise à jour
     @PrePersist
     @PreUpdate
