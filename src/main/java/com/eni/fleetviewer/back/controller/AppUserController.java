@@ -1,20 +1,23 @@
 package com.eni.fleetviewer.back.controller;
 
 import com.eni.fleetviewer.back.dto.AppUserDTO;
+import com.eni.fleetviewer.back.dto.ChangePasswordDTO;
 import com.eni.fleetviewer.back.dto.PersonDTO;
-import com.eni.fleetviewer.back.dto.RoleDTO;
 import com.eni.fleetviewer.back.model.AppUser;
 import com.eni.fleetviewer.back.model.Person;
 import com.eni.fleetviewer.back.repository.AppUserRepository;
 import com.eni.fleetviewer.back.service.AuthService;
 import com.eni.fleetviewer.back.service.JwtService;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
-import org.springframework.security.crypto.bcrypt.BCryptPasswordEncoder;
+import org.springframework.validation.annotation.Validated;
+import org.springframework.web.bind.annotation.*;
 import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.web.bind.annotation.*;
 import org.springframework.security.core.Authentication;
 import org.springframework.security.core.context.SecurityContextHolder;
+import org.springframework.web.server.ResponseStatusException;
 
 
 import java.security.Principal;
@@ -43,7 +46,7 @@ public class AppUserController {
         return new AppUserDTO(user);
     }
 
-    @GetMapping("/current")
+    @GetMapping("/me")
     public AppUserDTO getCurrentUser(Principal principal) {
         AppUser user = userRepository.findByUsername(principal.getName())
                 .orElseThrow(() -> new RuntimeException("Utilisateur non trouvé"));
@@ -105,6 +108,37 @@ public class AppUserController {
         }
     }
 
+    @PutMapping("/me/password")
+    public ResponseEntity<?> changeCurrentUserPassword(
+            @RequestBody @Validated ChangePasswordDTO dto,
+            Principal principal) {
+
+        AppUser user = userRepository.findByUsername(principal.getName())
+                .orElseThrow(() -> new ResponseStatusException(HttpStatus.NOT_FOUND, "Utilisateur non trouvé"));
+
+        // Vérifier présence des champs
+        if (dto.getCurrentPassword() == null || dto.getNewPassword() == null ||
+                dto.getCurrentPassword().isBlank() || dto.getNewPassword().isBlank()) {
+            throw new ResponseStatusException(HttpStatus.BAD_REQUEST, "Tous les champs sont obligatoires");
+        }
+
+        // Vérifier que le nouveau mot de passe n'est pas le même que l'actuel
+        if (passwordEncoder.matches(dto.getNewPassword(), user.getPassword())) {
+            throw new ResponseStatusException(HttpStatus.BAD_REQUEST, "Le nouveau mot de passe doit être différent de l'actuel");
+        }
+
+        // Vérifier l'ancien mot de passe
+        if (!passwordEncoder.matches(dto.getCurrentPassword(), user.getPassword())) {
+            throw new ResponseStatusException(HttpStatus.UNAUTHORIZED, "Mot de passe actuel incorrect");
+        }
+
+        // Encode et set le nouveau mot de passe
+        user.setPassword(passwordEncoder.encode(dto.getNewPassword()));
+        userRepository.save(user);
+
+        return ResponseEntity.ok().build();
+    }
+
     @PostMapping
     public AppUserDTO createUser(@RequestBody AppUserDTO dto) {
         AppUser u = dto.toEntity();
@@ -135,7 +169,7 @@ public class AppUserController {
         return new AppUserDTO(savedUser);
     }
 
-    @GetMapping("/username")
+    @GetMapping("/generate-username")
     public String generateUsername(@RequestParam String firstName, @RequestParam String lastName) {
         String baseUsername = ((!firstName.isEmpty() ? firstName.trim().charAt(0) : "") + (!lastName.isEmpty() ? lastName.trim() : "")).toLowerCase();
         String username = baseUsername;

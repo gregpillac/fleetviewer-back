@@ -48,9 +48,9 @@ public class SecurityConfig {
                 // Règles d'autorisation
                 .authorizeHttpRequests(auth -> auth
                         .requestMatchers("/api/auth/**").permitAll()
-                        .requestMatchers(HttpMethod.GET, "/api/users/current").authenticated()
-                        .requestMatchers(HttpMethod.GET, "/api/users/username").authenticated()
-                        .requestMatchers(HttpMethod.PUT, "/api/users/me").authenticated()
+                        .requestMatchers(HttpMethod.GET, "/api/users/me").authenticated()
+                        .requestMatchers(HttpMethod.PUT, "/api/users/me/**").authenticated()
+                        .requestMatchers(HttpMethod.GET, "/api/users/generate-username").authenticated()
                         .requestMatchers("/api/users/**").hasRole("ADMIN")
                         .anyRequest().authenticated()
                 )
