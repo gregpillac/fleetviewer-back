@@ -1,36 +1,40 @@
 package com.eni.fleetviewer.back.dto;
+import jakarta.validation.constraints.NotNull;
+import lombok.AllArgsConstructor;
+import lombok.Getter;
+import lombok.NoArgsConstructor;
+import lombok.Setter;
 
-import com.eni.fleetviewer.back.model.Place;
-import com.eni.fleetviewer.back.model.Vehicle;
-import lombok.*;
-
-@Getter
 @Setter
+@Getter
 @NoArgsConstructor
 @AllArgsConstructor
 public class VehicleDTO {
 
-    private Long id;
-    private String licensePlate;
-    private String brand;
-    private String model;
-    private Integer seats;
-    private Long mileage;
-    private boolean isRoadworthy;
-    private boolean isInsuranceValid;
-    private PlaceDTO place;
+private Long id;  // identifiant du véhicule (généré par la BDD)
 
-    public VehicleDTO(Vehicle vehicle) {
-        this.id = vehicle.getId();
-        this.licensePlate = vehicle.getLicensePlate();
-        this.brand = vehicle.getBrand();
-        this.model = vehicle.getModel();
-        this.seats = vehicle.getSeats();
-        this.mileage = vehicle.getMileage();
-        this.isRoadworthy = vehicle.isRoadworthy();
-        this.isInsuranceValid = vehicle.isInsuranceValid();
-        if (vehicle.getPlace() != null) {
-            this.place = new PlaceDTO(vehicle.getPlace());
-        }
-    }
+    @NotNull
+    private String licensePlate;    // numéro de plaque d’immatriculation
+
+    @NotNull
+    private String brand;           // marque du véhicule
+
+    @NotNull
+    private String model;           // modèle du véhicule
+
+    @NotNull
+    private Integer seats;          // nombre de places assises
+
+    @NotNull
+    private Long mileage;           // kilométrage actuel
+
+    @NotNull
+    private Boolean isRoadworthy;   // contrôle technique valide ?
+
+    @NotNull
+    private Boolean isInsuranceValid;  // assurance valide ?
+
+    @NotNull
+    private Long placeId;           // référence à l’entité Place (lieu associé)
+
 }

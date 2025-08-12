@@ -1,34 +1,32 @@
 package com.eni.fleetviewer.back.dto;
 
-import com.eni.fleetviewer.back.model.Place;
+import jakarta.validation.constraints.NotNull;
 import lombok.AllArgsConstructor;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
 import lombok.Setter;
 
-@Getter
 @Setter
+@Getter
 @NoArgsConstructor
 @AllArgsConstructor
 public class PlaceDTO {
-    private Long id;
-    private String name;
-    private boolean isPublic;
-    private PlaceTypeDTO placeType;
 
-    public PlaceDTO(Place place) {
-        this.id = place.getId();
-        this.name = place.getName();
-        this.isPublic = place.isPublic();
-        this.placeType = place.getPlaceType() != null ? new PlaceTypeDTO(place.getPlaceType()) : null;
-    }
+    private Long id;            // identifiant du Site (généré par la BDD)
 
-    public Place toEntity() {
-        Place p = new Place();
-        p.setId(this.id);
-        p.setName(this.name);
-        p.setPublic(this.isPublic);
-        p.setPlaceType(this.placeType != null ? this.placeType.toEntity() : null);
-        return p;
-    }
+    @NotNull
+    private String name;        // nom du Site
+
+    @NotNull
+    private Long placeId;       // référence à l’entité Place (lieu associé)
+
+    @NotNull
+    private boolean isPublic;   // ????????????
+
+    @NotNull
+    private Long placeTypeId;   // référence à l’entité PlaceType (type de lieu associé)
+
+    private Long addressId;     // référence à l’entité Address (adresse associée)
+
+    private Long createdById;   // "Lieux créé par .." (optionnel, si nécessaire)
 }

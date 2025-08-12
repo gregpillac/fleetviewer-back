@@ -52,6 +52,8 @@ public class SecurityConfig {
                         .requestMatchers(HttpMethod.PUT, "/api/users/me/**").authenticated()
                         .requestMatchers(HttpMethod.GET, "/api/users/generate-username").authenticated()
                         .requestMatchers("/api/users/**").hasRole("ADMIN")
+                        .requestMatchers("/api/vehicles/**").hasRole("ADMIN")
+                        .requestMatchers("/api/places/**").hasRole("ADMIN")
                         .anyRequest().authenticated()
                 )
                 .authenticationProvider(authenticationProvider())

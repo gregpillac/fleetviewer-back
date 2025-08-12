@@ -1,70 +1,95 @@
 package com.eni.fleetviewer.back.controller;
 
 import com.eni.fleetviewer.back.dto.VehicleDTO;
-import com.eni.fleetviewer.back.model.Place;
-import com.eni.fleetviewer.back.model.Vehicle;
-import com.eni.fleetviewer.back.repository.PlaceRepository;
-import com.eni.fleetviewer.back.repository.VehicleRepository;
-import org.springframework.beans.factory.annotation.Autowired;
+import com.eni.fleetviewer.back.service.VehicleService;
+import jakarta.validation.Valid;
+import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 
+import java.net.URI;
 import java.util.List;
 
 @RestController
 @RequestMapping("/api/vehicles")
 public class VehicleController {
 
-    @Autowired
-    private VehicleRepository vehicleRepository;
+    private final VehicleService vehicleService;
 
-    @Autowired
-    private PlaceRepository placeRepository;
+    public VehicleController(VehicleService vehicleService) {
+        this.vehicleService = vehicleService;
+    }
 
+
+    /**
+     * GET /api/vehicles : Récupère la liste de tous les véhicules.
+     * @return ResponseEntity avec le statut 200 OK et la liste des véhicules dans le corps.
+     */
     @GetMapping
-    public List<VehicleDTO> getAllVehicles() {
-        return vehicleRepository.findAll().stream().map(VehicleDTO::new).toList();
+    public ResponseEntity<List<VehicleDTO>> getAllVehicles() {
+
+        List<VehicleDTO> vehicles = vehicleService.getAllVehicles();
+        return ResponseEntity.ok(vehicles);
     }
 
+
+    /**
+     * GET /api/vehicles/{id} : Récupère un véhicule par son identifiant.
+     * @param id L'identifiant du véhicule à récupérer.
+     * @return ResponseEntity avec le statut 200 OK et le véhicule trouvé,
+     * ou 404 Not Found si l'ID n'existe pas (géré par un exception handler).
+     */
     @GetMapping("/{id}")
-    public VehicleDTO getVehicleById(@PathVariable Long id) {
-        Vehicle vehicle = vehicleRepository.findById(id)
-                .orElseThrow(() -> new RuntimeException("Véhicule non trouvé"));
-        return new VehicleDTO(vehicle);
+    public ResponseEntity<VehicleDTO> getVehicleById (
+            @PathVariable Long id) {
+
+        VehicleDTO vehicle = vehicleService.getVehicleById(id);
+        return ResponseEntity.ok(vehicle);
     }
 
+
+    /**
+     * POST /api/vehicles : Crée un nouveau véhicule.
+     * @param dto Le DTO du véhicule à créer, validé à partir du corps de la requête.
+     * @return ResponseEntity avec le statut 201 Created, l'en-tête Location pointant
+     * vers la nouvelle ressource, et le DTO du véhicule créé dans le corps.
+     */
     @PostMapping
-    public VehicleDTO createVehicle(@RequestBody Vehicle vehicle) {
-        // Vérifier que le place existe
-        Place place = placeRepository.findById(vehicle.getPlace().getId())
-                .orElseThrow(() -> new RuntimeException("Lieu non trouvé"));
-        vehicle.setPlace(place);
-        return new VehicleDTO(vehicleRepository.save(vehicle));
+    public ResponseEntity<VehicleDTO> addVehicle(
+            @Valid @RequestBody VehicleDTO dto){
+
+        VehicleDTO created = vehicleService.addVehicle(dto);
+        // Création de l'URI pour l'en-tête Location
+        URI location = URI.create("/api/vehicles/" + created.getId());
+        return ResponseEntity.created(location).body(created);
     }
 
+
+    /**
+     * PUT /api/vehicles/{id} : Met à jour un véhicule existant.
+     * @param id L'identifiant du véhicule à mettre à jour.
+     * @param dto Le DTO contenant les nouvelles informations du véhicule.
+     * @return ResponseEntity avec le statut 200 OK et le DTO du véhicule mis à jour.
+     */
     @PutMapping("/{id}")
-    public VehicleDTO updateVehicle(@PathVariable Long id, @RequestBody Vehicle updated) {
-        Vehicle vehicle = vehicleRepository.findById(id)
-                .orElseThrow(() -> new RuntimeException("Véhicule non trouvé"));
+    public ResponseEntity<VehicleDTO> updateVehicle(
+            @PathVariable Long id,
+            @Valid @RequestBody VehicleDTO dto) {
 
-        vehicle.setLicensePlate(updated.getLicensePlate());
-        vehicle.setBrand(updated.getBrand());
-        vehicle.setModel(updated.getModel());
-        vehicle.setSeats(updated.getSeats());
-        vehicle.setMileage(updated.getMileage());
-        vehicle.setRoadworthy(updated.isRoadworthy());
-        vehicle.setInsuranceValid(updated.isInsuranceValid());
-
-        if (updated.getPlace() != null) {
-            Place place = placeRepository.findById(updated.getPlace().getId())
-                    .orElseThrow(() -> new RuntimeException("Lieu non trouvé"));
-            vehicle.setPlace(place);
-        }
-
-        return new VehicleDTO(vehicleRepository.save(vehicle));
+        VehicleDTO updatedVehicle = vehicleService.updateVehicle(id, dto);
+        return ResponseEntity.ok(updatedVehicle);
     }
 
+
+    /**
+     * DELETE /api/vehicles/{id} : Supprime un véhicule par son identifiant.
+     * @param id L'identifiant du véhicule à supprimer.
+     * @return ResponseEntity avec le statut 204 No Content si la suppression a réussi.
+     */
     @DeleteMapping("/{id}")
-    public void deleteVehicle(@PathVariable Long id) {
-        vehicleRepository.deleteById(id);
+    public ResponseEntity<Void> deleteVehicleById (
+            @PathVariable Long id) {
+
+        vehicleService.deleteVehicleById(id);
+        return ResponseEntity.noContent().build();
     }
 }
