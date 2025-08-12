@@ -30,6 +30,7 @@ public class Place {
     @JoinColumn(name = "place_type_id", nullable = false)
     private PlaceType placeType;
 
+    //Est ce que c'est bien utile ?
     @ManyToOne(fetch = FetchType.LAZY)
     @JoinColumn(name = "person_id")
     private Person createdBy; // "Lieux créé par .."
