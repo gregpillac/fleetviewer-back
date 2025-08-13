@@ -86,8 +86,8 @@ public class VehicleService {
         // Mise à jour les champs
         existing.setSeats(dto.getSeats());
         existing.setMileage(dto.getMileage());
-        existing.setRoadworthy(dto.getIsRoadworthy());
-        existing.setInsuranceValid(dto.getIsInsuranceValid());
+        existing.setIsRoadworthy(dto.getIsRoadworthy());
+        existing.setIsInsuranceValid(dto.getIsInsuranceValid());
         existing.setPlace(vehicleMapper.longToPlace(dto.getPlaceId()));
         // Sauvegarde
         Vehicle saved = vehicleRepo.save(existing);

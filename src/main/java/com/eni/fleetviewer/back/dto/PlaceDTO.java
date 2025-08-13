@@ -18,9 +18,6 @@ public class PlaceDTO {
     private String name;        // nom du Site
 
     @NotNull
-    private Long placeId;       // référence à l’entité Place (lieu associé)
-
-    @NotNull
     private boolean isPublic;   // ????????????
 
     @NotNull

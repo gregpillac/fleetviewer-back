@@ -7,7 +7,7 @@ import com.eni.fleetviewer.back.model.Vehicle;
 import com.eni.fleetviewer.back.repository.PlaceRepository;
 import org.mapstruct.Mapper;
 import org.mapstruct.Mapping;
-import org.mapstruct.Mappings;
+import org.mapstruct.Named;
 import org.springframework.beans.factory.annotation.Autowired;
 
 @Mapper(componentModel = "spring")
@@ -22,22 +22,22 @@ public abstract class VehicleMapper {
     @Autowired
     protected PlaceRepository placeRepository;
 
-    @Mappings({
-            @Mapping(source = "place.id", target = "placeId")
-    })
+    @Mapping(source = "place.id", target = "placeId")
+    @Mapping(source = "isRoadworthy", target = "isRoadworthy")
+    @Mapping(source = "isInsuranceValid", target = "isInsuranceValid")
     public abstract VehicleDTO toDto(Vehicle vehicle);
 
-    @Mappings({
-            @Mapping(source = "placeId", target = "place")
-    })
+
+    @Mapping(source = "placeId", target = "place", qualifiedByName = "longToPlace")
+    @Mapping(source = "isRoadworthy", target = "isRoadworthy")
+    @Mapping(source = "isInsuranceValid", target = "isInsuranceValid")
     public abstract Vehicle toEntity(VehicleDTO vehicleDTO);
 
-    // Méthode personnalisée pour convertir un ID en entité Place
+
+    @Named("longToPlace")
     public Place longToPlace(Long placeId) {
-        if (placeId == null) {
-            return null;
-        }
+        if (placeId == null) return null;
         return placeRepository.findById(placeId)
-                .orElseThrow(() -> new RessourceNotFoundException("Place introuvable pour l’ID " + placeId));
+                .orElseThrow(() -> new RessourceNotFoundException("Site introuvable pour l’ID " + placeId));
     }
 }

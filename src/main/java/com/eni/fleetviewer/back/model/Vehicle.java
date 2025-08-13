@@ -39,11 +39,11 @@ public class Vehicle {
 
     @NotNull
     @Column(name = "is_roadworthy", nullable = false)
-    private boolean isRoadworthy; // Contrôle technique valable
+    private Boolean isRoadworthy; // Contrôle technique valable
 
     @NotNull
     @Column(name = "is_insurance_valid", nullable = false)
-    private boolean isInsuranceValid;
+    private Boolean isInsuranceValid;
 
     @NotNull
     @ManyToOne(fetch = FetchType.LAZY)

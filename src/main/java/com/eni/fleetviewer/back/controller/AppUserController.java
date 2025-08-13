@@ -3,6 +3,8 @@ package com.eni.fleetviewer.back.controller;
 import com.eni.fleetviewer.back.dto.AppUserDTO;
 import com.eni.fleetviewer.back.dto.ChangePasswordDTO;
 import com.eni.fleetviewer.back.dto.PersonDTO;
+import com.eni.fleetviewer.back.mapper.PlaceMapper;
+import com.eni.fleetviewer.back.mapper.UserMapper;
 import com.eni.fleetviewer.back.model.AppUser;
 import com.eni.fleetviewer.back.model.Person;
 import com.eni.fleetviewer.back.repository.AppUserRepository;
@@ -14,7 +16,6 @@ import org.springframework.http.ResponseEntity;
 import org.springframework.validation.annotation.Validated;
 import org.springframework.web.bind.annotation.*;
 import org.springframework.security.crypto.password.PasswordEncoder;
-import org.springframework.web.bind.annotation.*;
 import org.springframework.security.core.Authentication;
 import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.web.server.ResponseStatusException;
@@ -31,11 +32,13 @@ public class AppUserController {
     @Autowired private AuthService authService;
     @Autowired private JwtService jwtService;
     @Autowired private PasswordEncoder passwordEncoder;
+    @Autowired private PlaceMapper placeMapper;
+    @Autowired private UserMapper userMapper;
 
     @GetMapping
     public List<AppUserDTO> getUsers() {    // Renvoie tous les utilisateurs
         return userRepository.findAll().stream()
-                .map(AppUserDTO::new)
+                .map(userMapper::toDto)
                 .toList();
     }
 
@@ -43,14 +46,14 @@ public class AppUserController {
     public AppUserDTO getUserByUsername(@PathVariable String username) {
         AppUser user = userRepository.findByUsername(username)
                 .orElseThrow(() -> new RuntimeException("Utilisateur non trouvé"));
-        return new AppUserDTO(user);
+        return userMapper.toDto(user);
     }
 
     @GetMapping("/me")
     public AppUserDTO getCurrentUser(Principal principal) {
         AppUser user = userRepository.findByUsername(principal.getName())
                 .orElseThrow(() -> new RuntimeException("Utilisateur non trouvé"));
-        return new AppUserDTO(user);
+        return userMapper.toDto(user);
     }
 
     @PutMapping("/me")
@@ -87,7 +90,7 @@ public class AppUserController {
             p.setEmail(personDTO.getEmail());
             p.setPhone(personDTO.getPhone());
             if (personDTO.getAddress() != null) p.setAddress(personDTO.getAddress().toEntity());
-            if (personDTO.getPlace() != null) p.setPlace(personDTO.getPlace().toEntity());
+            if (personDTO.getPlace() != null) p.setPlace(placeMapper.toEntity(personDTO.getPlace()));
             user.setPerson(p);
         }
 
@@ -100,11 +103,11 @@ public class AppUserController {
 
         if (token != null) {
             Map<String, Object> response = new HashMap<>();
-            response.put("user", new AppUserDTO(savedUser));
+            response.put("user", userMapper.toDto(savedUser));
             response.put("token", token);
             return ResponseEntity.ok(response);
         } else {
-            return ResponseEntity.ok(new AppUserDTO(savedUser));
+            return ResponseEntity.ok(userMapper.toDto(savedUser));
         }
     }
 
@@ -141,11 +144,11 @@ public class AppUserController {
 
     @PostMapping
     public AppUserDTO createUser(@RequestBody AppUserDTO dto) {
-        AppUser u = dto.toEntity();
+        AppUser u = userMapper.toEntity(dto);
         u.setPassword(passwordEncoder.encode(dto.getPassword()));
 
         AppUser savedUser = userRepository.save(u);
-        return new AppUserDTO(savedUser);
+        return userMapper.toDto(savedUser);
     }
 
     @PutMapping("/{id}")
@@ -153,10 +156,8 @@ public class AppUserController {
         AppUser user = userRepository.findById(id)
                 .orElseThrow(() -> new RuntimeException("Utilisateur non trouvé"));
 
-        //
-
         AppUser savedUser = userRepository.save(user);
-        return new AppUserDTO(savedUser);
+        return userMapper.toDto(savedUser);
     }
 
     @PutMapping("/status/{id}")
@@ -166,7 +167,7 @@ public class AppUserController {
 
         user.setEnabled(enabled);
         AppUser savedUser = userRepository.save(user);
-        return new AppUserDTO(savedUser);
+        return userMapper.toDto(savedUser);
     }
 
     @GetMapping("/generate-username")
