@@ -3,6 +3,7 @@ package com.eni.fleetviewer.back.controller;
 import com.eni.fleetviewer.back.dto.AppUserDTO;
 import com.eni.fleetviewer.back.dto.ChangePasswordDTO;
 import com.eni.fleetviewer.back.dto.PersonDTO;
+import com.eni.fleetviewer.back.mapper.AddressMapper;
 import com.eni.fleetviewer.back.mapper.PlaceMapper;
 import com.eni.fleetviewer.back.mapper.UserMapper;
 import com.eni.fleetviewer.back.model.AppUser;
@@ -34,6 +35,7 @@ public class AppUserController {
     @Autowired private PasswordEncoder passwordEncoder;
     @Autowired private PlaceMapper placeMapper;
     @Autowired private UserMapper userMapper;
+    @Autowired private AddressMapper addressMapper;
 
     @GetMapping
     public List<AppUserDTO> getUsers() {    // Renvoie tous les utilisateurs
@@ -89,7 +91,7 @@ public class AppUserController {
             p.setLastName(personDTO.getLastName());
             p.setEmail(personDTO.getEmail());
             p.setPhone(personDTO.getPhone());
-            if (personDTO.getAddress() != null) p.setAddress(personDTO.getAddress().toEntity());
+            if (personDTO.getAddress() != null) p.setAddress(addressMapper.addressDTOToAddress(personDTO.getAddress()));
             if (personDTO.getPlace() != null) p.setPlace(placeMapper.toEntity(personDTO.getPlace()));
             user.setPerson(p);
         }
