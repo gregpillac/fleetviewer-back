@@ -170,6 +170,12 @@ public class AppUserController {
         return userMapper.toDto(savedUser);
     }
 
+    @DeleteMapping("/{id}")
+    @ResponseStatus(HttpStatus.NO_CONTENT)
+    public void delete(@PathVariable Long id) {
+        userRepository.deleteById(id);
+    }
+
     @GetMapping("/generate-username")
     public String generateUsername(@RequestParam String firstName, @RequestParam String lastName) {
         String baseUsername = ((!firstName.isEmpty() ? firstName.trim().charAt(0) : "") + (!lastName.isEmpty() ? lastName.trim() : "")).toLowerCase();
