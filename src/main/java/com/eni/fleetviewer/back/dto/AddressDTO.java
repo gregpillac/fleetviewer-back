@@ -5,6 +5,8 @@ import lombok.Getter;
 import lombok.NoArgsConstructor;
 import lombok.Setter;
 
+import java.util.Map;
+
 @Getter
 @Setter
 @NoArgsConstructor
@@ -15,5 +17,5 @@ public class AddressDTO {
     private String addressSecondLine;
     private String postalCode;
     private String city;
-    private String gpsCoords;
+    private Map<String, Object> gpsCoords;
 }

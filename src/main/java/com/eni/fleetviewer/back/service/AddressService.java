@@ -9,7 +9,9 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
+import java.util.List;
 import java.util.NoSuchElementException;
+import java.util.stream.Collectors;
 
 /**
  * Service métier pour gérer les opérations sur les adresses.
@@ -89,5 +91,11 @@ public class AddressService {
             throw new NoSuchElementException("Adresse introuvable pour l'ID " + id);
         }
         addressRepository.deleteById(id);
+    }
+    @Transactional(readOnly = true)
+    public List<AddressDTO> getAllAddresses() {
+        return addressRepository.findAll().stream()
+                .map(addressMapper::addressToAddressDTO)
+                .collect(Collectors.toList());
     }
 }

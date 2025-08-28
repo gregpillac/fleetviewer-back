@@ -11,6 +11,7 @@ import org.mockito.InjectMocks;
 import org.mockito.Mock;
 import org.mockito.MockitoAnnotations;
 
+import java.util.Map;
 import java.util.Optional;
 
 import static org.junit.jupiter.api.Assertions.*;
@@ -37,10 +38,10 @@ public class AddressServiceTest {
 
     @Test
     public void testCreateAddress_shouldReturnSavedAddressDTO() {
-        AddressDTO inputDTO = new AddressDTO(null, "123 Rue A", "Bat B", "75000", "Paris", "{\"lat\":48.85,\"lng\":2.35}");
-        Address addressEntity = new Address(null, "123 Rue A", "Bat B", "75000", "Paris", "{\"lat\":48.85,\"lng\":2.35}");
-        Address savedAddress = new Address(1L, "123 Rue A", "Bat B", "75000", "Paris", "{\"lat\":48.85,\"lng\":2.35}");
-        AddressDTO expectedDTO = new AddressDTO(1L, "123 Rue A", "Bat B", "75000", "Paris", "{\"lat\":48.85,\"lng\":2.35}");
+        AddressDTO inputDTO = new AddressDTO(null, "123 Rue A", "Bat B", "75000", "Paris", Map.of("lat","48.85","lng","2.35"));
+        Address addressEntity = new Address(null, "123 Rue A", "Bat B", "75000", "Paris",Map.of("lat","48.85","lng","2.35"));
+        Address savedAddress = new Address(1L, "123 Rue A", "Bat B", "75000", "Paris",Map.of("lat","48.85","lng","2.35"));
+        AddressDTO expectedDTO = new AddressDTO(1L, "123 Rue A", "Bat B", "75000", "Paris",Map.of("lat","48.85","lng","2.35"));
 
         when(addressMapper.addressDTOToAddress(inputDTO)).thenReturn(addressEntity);
         when(addressRepository.save(addressEntity)).thenReturn(savedAddress);
@@ -60,8 +61,8 @@ public class AddressServiceTest {
     @Test
     public void testGetAddressById_shouldReturnAddressDTO() {
         Long id = 1L;
-        Address addressEntity = new Address(id, "123 Rue A", "Bat B", "75000", "Paris", "{}");
-        AddressDTO expectedDTO = new AddressDTO(id, "123 Rue A", "Bat B", "75000", "Paris", "{}");
+        Address addressEntity = new Address(id, "123 Rue A", "Bat B", "75000", "Paris", null);
+        AddressDTO expectedDTO = new AddressDTO(id, "123 Rue A", "Bat B", "75000", "Paris", null);
 
         when(addressRepository.findById(id)).thenReturn(Optional.of(addressEntity));
         when(addressMapper.addressToAddressDTO(addressEntity)).thenReturn(expectedDTO);
@@ -79,10 +80,10 @@ public class AddressServiceTest {
     @Test
     public void testUpdateAddress_shouldReturnUpdatedDTO() {
         Long id = 1L;
-        AddressDTO inputDTO = new AddressDTO(id, "456 Rue C", "Etage 3", "69000", "Lyon", "{}");
-        Address existingAddress = new Address(id, "Old Line", "Old Line 2", "00000", "Old City", "{}");
-        Address updatedAddress = new Address(id, "456 Rue C", "Etage 3", "69000", "Lyon", "{}");
-        AddressDTO expectedDTO = new AddressDTO(id, "456 Rue C", "Etage 3", "69000", "Lyon", "{}");
+        AddressDTO inputDTO = new AddressDTO(id, "456 Rue C", "Etage 3", "69000", "Lyon", null);
+        Address existingAddress = new Address(id, "Old Line", "Old Line 2", "00000", "Old City", null);
+        Address updatedAddress = new Address(id, "456 Rue C", "Etage 3", "69000", "Lyon", null);
+        AddressDTO expectedDTO = new AddressDTO(id, "456 Rue C", "Etage 3", "69000", "Lyon", null);
 
         when(addressRepository.findById(id)).thenReturn(Optional.of(existingAddress));
         when(addressRepository.save(existingAddress)).thenReturn(updatedAddress);

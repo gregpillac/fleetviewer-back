@@ -3,8 +3,10 @@ package com.eni.fleetviewer.back.model;
 import jakarta.persistence.*;
 import jakarta.validation.constraints.NotNull;
 import lombok.*;
+import org.hibernate.annotations.JdbcTypeCode;
+import org.hibernate.type.SqlTypes;
 
-
+import java.util.Map;
 
 
 @Getter
@@ -36,5 +38,6 @@ public class Address {
     private String city;
 
     @Column(name = "gps_coords", columnDefinition = "JSON")
-    private String gpsCoords;
+    @JdbcTypeCode(SqlTypes.JSON)
+    private Map<String, Object> gpsCoords;
 }

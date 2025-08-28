@@ -7,6 +7,8 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 
+import java.util.List;
+
 /**
  * Contrôleur REST pour gérer les adresses.
  */
@@ -50,7 +52,11 @@ public class AddressController {
         return ResponseEntity.ok(address);
     }
 
-
+    @GetMapping
+    public ResponseEntity<List<AddressDTO>> getAllAddresses() {
+        List<AddressDTO> addresses = addressService.getAllAddresses();
+        return ResponseEntity.ok(addresses);
+    }
     @PutMapping("/{id}")
     public ResponseEntity<AddressDTO> updateAddress(
             @PathVariable Long id,
