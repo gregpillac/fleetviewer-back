@@ -91,7 +91,7 @@ public class AppUserController {
             p.setLastName(personDTO.getLastName());
             p.setEmail(personDTO.getEmail());
             p.setPhone(personDTO.getPhone());
-            if (personDTO.getAddress() != null) p.setAddress(addressMapper.addressDTOToAddress(personDTO.getAddress()));
+            if (personDTO.getAddress() != null) p.setAddress(addressMapper.toEntity(personDTO.getAddress()));
             if (personDTO.getPlace() != null) p.setPlace(placeMapper.toEntity(personDTO.getPlace()));
             user.setPerson(p);
         }

@@ -39,9 +39,9 @@ public class AddressService {
      */
     @Transactional
     public AddressDTO createAddress(@Valid AddressDTO addressDTO) {
-        Address address = addressMapper.addressDTOToAddress(addressDTO);
+        Address address = addressMapper.toEntity(addressDTO);
         Address savedAddress = addressRepository.save(address);
-        return addressMapper.addressToAddressDTO(savedAddress);
+        return addressMapper.toDto(savedAddress);
     }
 
     /**
@@ -54,7 +54,7 @@ public class AddressService {
     public AddressDTO getAddressById(Long id) {
         Address address = addressRepository.findById(id)
                 .orElseThrow(() -> new NoSuchElementException("Adresse introuvable pour l'ID " + id));
-        return addressMapper.addressToAddressDTO(address);
+        return addressMapper.toDto(address);
     }
 
     /**
@@ -77,7 +77,7 @@ public class AddressService {
         existing.setGpsCoords(addressDTO.getGpsCoords());
 
         Address updated = addressRepository.save(existing);
-        return addressMapper.addressToAddressDTO(updated);
+        return addressMapper.toDto(updated);
     }
 
     /**
@@ -95,7 +95,7 @@ public class AddressService {
     @Transactional(readOnly = true)
     public List<AddressDTO> getAllAddresses() {
         return addressRepository.findAll().stream()
-                .map(addressMapper::addressToAddressDTO)
+                .map(addressMapper::toDto)
                 .collect(Collectors.toList());
     }
 }

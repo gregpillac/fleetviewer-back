@@ -24,7 +24,7 @@ public abstract class AddressMapper {
     @Mapping(source = "postalCode", target = "postalCode")
     @Mapping(source = "city", target = "city")
     @Mapping(source = "gpsCoords", target = "gpsCoords")
-    public abstract AddressDTO addressToAddressDTO(Address address);
+    public abstract AddressDTO toDto(Address address);
 
     /**
      * Convertit AddressDTO en entité Address.
@@ -35,7 +35,7 @@ public abstract class AddressMapper {
     @Mapping(source = "postalCode", target = "postalCode")
     @Mapping(source = "city", target = "city")
     @Mapping(source = "gpsCoords", target = "gpsCoords")
-    public abstract Address addressDTOToAddress(AddressDTO addressDTO);
+    public abstract Address toEntity(AddressDTO addressDTO);
 
 
     @Named("addressIdToAddress")

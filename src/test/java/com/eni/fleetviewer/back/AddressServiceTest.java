@@ -43,9 +43,9 @@ public class AddressServiceTest {
         Address savedAddress = new Address(1L, "123 Rue A", "Bat B", "75000", "Paris",Map.of("lat","48.85","lng","2.35"));
         AddressDTO expectedDTO = new AddressDTO(1L, "123 Rue A", "Bat B", "75000", "Paris",Map.of("lat","48.85","lng","2.35"));
 
-        when(addressMapper.addressDTOToAddress(inputDTO)).thenReturn(addressEntity);
+        when(addressMapper.toEntity(inputDTO)).thenReturn(addressEntity);
         when(addressRepository.save(addressEntity)).thenReturn(savedAddress);
-        when(addressMapper.addressToAddressDTO(savedAddress)).thenReturn(expectedDTO);
+        when(addressMapper.toDto(savedAddress)).thenReturn(expectedDTO);
 
         AddressDTO result = addressService.createAddress(inputDTO);
 
@@ -53,9 +53,9 @@ public class AddressServiceTest {
         assertEquals(1L, result.getId());
         assertEquals("Paris", result.getCity());
 
-        verify(addressMapper).addressDTOToAddress(inputDTO);
+        verify(addressMapper).toEntity(inputDTO);
         verify(addressRepository).save(addressEntity);
-        verify(addressMapper).addressToAddressDTO(savedAddress);
+        verify(addressMapper).toDto(savedAddress);
     }
 
     @Test
@@ -65,7 +65,7 @@ public class AddressServiceTest {
         AddressDTO expectedDTO = new AddressDTO(id, "123 Rue A", "Bat B", "75000", "Paris", null);
 
         when(addressRepository.findById(id)).thenReturn(Optional.of(addressEntity));
-        when(addressMapper.addressToAddressDTO(addressEntity)).thenReturn(expectedDTO);
+        when(addressMapper.toDto(addressEntity)).thenReturn(expectedDTO);
 
         AddressDTO result = addressService.getAddressById(id);
 
@@ -74,7 +74,7 @@ public class AddressServiceTest {
         assertEquals("Paris", result.getCity());
 
         verify(addressRepository).findById(id);
-        verify(addressMapper).addressToAddressDTO(addressEntity);
+        verify(addressMapper).toDto(addressEntity);
     }
 
     @Test
@@ -87,7 +87,7 @@ public class AddressServiceTest {
 
         when(addressRepository.findById(id)).thenReturn(Optional.of(existingAddress));
         when(addressRepository.save(existingAddress)).thenReturn(updatedAddress);
-        when(addressMapper.addressToAddressDTO(updatedAddress)).thenReturn(expectedDTO);
+        when(addressMapper.toDto(updatedAddress)).thenReturn(expectedDTO);
 
         AddressDTO result = addressService.updateAddress(id, inputDTO);
 
@@ -96,7 +96,7 @@ public class AddressServiceTest {
 
         verify(addressRepository).findById(id);
         verify(addressRepository).save(existingAddress);
-        verify(addressMapper).addressToAddressDTO(updatedAddress);
+        verify(addressMapper).toDto(updatedAddress);
     }
 
     @Test
