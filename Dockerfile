@@ -1,42 +1,26 @@
-# ---------- Étape 0 : variables réutilisables ----------
-ARG JDK_IMAGE=maven:3.9.6-eclipse-temurin-21
-ARG JRE_IMAGE=eclipse-temurin:21-jre
-
-# ---------- Étape 1 : build (cache Maven optimisé) ----------
-FROM ${JDK_IMAGE} AS build
+# --------- Étape 1 : build WAR avec Maven (JDK 21) ---------
+FROM maven:3.9.6-eclipse-temurin-21 AS build
 WORKDIR /app
-
-# 1) Pré-copie des fichiers de config pour "chauffer" le cache Maven
-#    (si tu utilises le wrapper Maven, copie aussi .mvn et mvnw)
 COPY pom.xml .
 COPY .mvn/ .mvn/
 COPY mvnw* ./
-
-# Télécharge les deps hors-ligne -> builds plus rapides
 RUN ./mvnw -B -q -DskipTests dependency:go-offline || mvn -B -q -DskipTests dependency:go-offline
-
-# 2) Copie du code et build du JAR
 COPY src/ src/
 RUN ./mvnw -B -q -DskipTests clean package || mvn -B -q -DskipTests clean package
 
-# ---------- Étape 2 : runtime léger ----------
-FROM ${JRE_IMAGE}
-WORKDIR /app
+# --------- Étape 2 : Tomcat 10 (JDK 21) ---------
+FROM tomcat:10.1-jdk21-temurin
+WORKDIR /usr/local/tomcat
 
-# Sécurité : utilisateur non-root
-RUN useradd -m spring && chown -R spring:spring /app
-USER spring
+# Nettoyage des apps par défaut
+RUN rm -rf webapps/*
 
-# Localisation/encodage (logs lisibles, JSON correct)
-ENV LANG=C.UTF-8 \
-    LC_ALL=C.UTF-8 \
-    TZ=Europe/Paris
+# On déploie le WAR comme application ROOT
+COPY --from=build /app/target/*.war webapps/ROOT.war
 
-# Options JVM raisonnables pour Render (mémoire & CPU dynamiques)
-ENV JAVA_TOOL_OPTIONS="-XX:+UseG1GC -XX:MaxRAMPercentage=75 -XX:ActiveProcessorCount=2 -Dfile.encoding=UTF-8 -Djava.security.egd=file:/dev/urandom"
+# (Optionnel) logs lisibles + mémoire
+ENV LANG=C.UTF-8 LC_ALL=C.UTF-8 TZ=Europe/Paris \
+    JAVA_OPTS="-XX:+UseG1GC -XX:MaxRAMPercentage=75 -Dfile.encoding=UTF-8"
 
-# Copie du JAR construit à l’étape build
-COPY --from=build /app/target/*.jar app.jar
-
-# Démarrage : Render injecte $PORT -> on le passe à Spring
-CMD ["sh", "-c", "java -Dserver.port=$PORT -jar app.jar"]
+# IMPORTANT : Render impose $PORT, on le pousse dans server.xml avant de lancer Tomcat
+CMD sh -c "sed -ri 's/port=\"8080\"/port=\"'\"$PORT\"'\"/' conf/server.xml && catalina.sh run"
