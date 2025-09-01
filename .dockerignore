@@ -1,0 +1,15 @@
+# Git & IDE
+.git
+.gitignore
+.idea
+.vscode
+*.iml
+
+# Builds locaux
+target
+build
+out
+
+# Autres
+node_modules
+*.log
