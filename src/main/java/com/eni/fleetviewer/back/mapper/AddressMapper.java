@@ -12,11 +12,15 @@ import org.springframework.beans.factory.annotation.Autowired;
 @Mapper(componentModel = "spring")
 public abstract class AddressMapper {
 
+    /**
+     * Injection du repository Address pour la conversion d’ID en entité Address.
+     * MapStruct ne gère pas l’injection de dépendance via le constructeur dans les mappers abstraits.
+     */
     @Autowired
     protected AddressRepository addressRepository;
 
     /**
-     * Convertit l'entité Address en AddressDTO.
+     * Convertit une entité Address en AddressDTO.
      */
     @Mapping(source = "id", target = "id")
     @Mapping(source = "addressFirstLine", target = "addressFirstLine")
@@ -24,10 +28,10 @@ public abstract class AddressMapper {
     @Mapping(source = "postalCode", target = "postalCode")
     @Mapping(source = "city", target = "city")
     @Mapping(source = "gpsCoords", target = "gpsCoords")
-    public abstract AddressDTO addressToAddressDTO(Address address);
+    public abstract AddressDTO toDto(Address address);
 
     /**
-     * Convertit AddressDTO en entité Address.
+     * Convertit un AddressDTO en entité Address.
      */
     @Mapping(source = "id", target = "id")
     @Mapping(source = "addressFirstLine", target = "addressFirstLine")
@@ -35,13 +39,20 @@ public abstract class AddressMapper {
     @Mapping(source = "postalCode", target = "postalCode")
     @Mapping(source = "city", target = "city")
     @Mapping(source = "gpsCoords", target = "gpsCoords")
-    public abstract Address addressDTOToAddress(AddressDTO addressDTO);
+    public abstract Address toEntity(AddressDTO addressDTO);
 
-
-    @Named("addressIdToAddress")
-    public Address addressIdToAddress(Long id) {
+    /**
+     * Méthode utilitaire pour convertir un ID en entité Address.
+     * Utilisable dans d'autres mappings si nécessaire.
+     */
+    @Named("longToAddress")
+    public Address longToAddress(Long id) {
         if (id == null) return null;
         return addressRepository.findById(id)
-                .orElseThrow(() -> new RessourceNotFoundException("Adresse introuvable pour l'ID " + id));
+                .orElseThrow(() -> new RessourceNotFoundException("Adresse introuvable pour l’ID " + id));
     }
+
+    public abstract AddressDTO addressToAddressDTO(Address address);
+
+    public abstract Address addressDTOToAddress(AddressDTO addressDTO);
 }
