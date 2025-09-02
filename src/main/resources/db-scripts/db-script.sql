@@ -103,11 +103,12 @@ CREATE TABLE app_users (
 -- Table 'reservations' (Réservations)
 CREATE TABLE reservations (
     reservation_id BIGSERIAL PRIMARY KEY,
-    reservation_date timestamp NOT NULL,
-    reservation_status_id bigint NOT NULL,
+    start_date timestamp NOT NULL,
+    end_date timestamp NOT NULL,
+    status_id bigint NOT NULL,
     vehicle_id bigint NOT NULL,
     person_id bigint NOT NULL,
-    CONSTRAINT fk_reservations_status FOREIGN KEY (reservation_status_id) REFERENCES reservation_status(reservation_status_id),
+    CONSTRAINT fk_reservations_status FOREIGN KEY (status_id) REFERENCES reservation_status(reservation_status_id),
     CONSTRAINT fk_reservations_vehicles FOREIGN KEY (vehicle_id) REFERENCES vehicles(vehicle_id),
     CONSTRAINT fk_reservations_persons FOREIGN KEY (person_id) REFERENCES persons(person_id)
 );
