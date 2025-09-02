@@ -55,6 +55,7 @@ public class SecurityConfig {
                         .requestMatchers("/api/users/**").hasRole("ADMIN")
                         .requestMatchers("/api/vehicles/**").hasRole("ADMIN")
                         .requestMatchers("/api/places/**").hasRole("ADMIN")
+                        .requestMatchers("/api/reservations/**").authenticated() //TODO: gerer plus finement les droits
                         .anyRequest().authenticated()
                 )
                 .authenticationProvider(authenticationProvider())
