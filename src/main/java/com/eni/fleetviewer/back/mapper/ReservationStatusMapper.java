@@ -16,21 +16,21 @@ public abstract class ReservationStatusMapper {
     protected ReservationStatusRepository reservationStatusRepository;
 
     /**
-     * Convertit l'entité ReservationStatus en DTO.
+     * Convertit l'entité Status en DTO.
      */
     @Mapping(source = "id", target = "id")
     @Mapping(source = "name", target = "name")
     public abstract ReservationStatusDTO toDto(ReservationStatus entity);
 
     /**
-     * Convertit le DTO ReservationStatus en entité.
+     * Convertit le DTO Status en entité.
      */
     @Mapping(source = "id", target = "id")
     @Mapping(source = "name", target = "name")
     public abstract ReservationStatus toEntity(ReservationStatusDTO dto);
 
     /**
-     * Méthode utilitaire pour mapper un ID vers une entité ReservationStatus.
+     * Méthode utilitaire pour mapper un ID vers une entité Status.
      */
     @Named("reservationStatusIdToEntity")
     public ReservationStatus reservationStatusIdToEntity(Long id) {

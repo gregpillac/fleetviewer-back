@@ -17,7 +17,7 @@ import java.util.List;
 import static org.junit.jupiter.api.Assertions.*;
 import static org.mockito.Mockito.*;
 
-public class ReservationStatusServiceTest {
+public class StatusServiceTest {
 
     @Mock
     private ReservationStatusRepository statusRepository;
