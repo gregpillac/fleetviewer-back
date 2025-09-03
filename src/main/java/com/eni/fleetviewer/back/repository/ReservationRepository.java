@@ -13,13 +13,11 @@ import java.util.List;
 public interface ReservationRepository extends JpaRepository<Reservation, Long> {
 
     /**
-     * Trouve les réservations confirmées pour un véhicule donné qui chevauchent une période donnée,
-     * en excluant une réservation spécifique (celle en cours de validation).
+     * Trouve les réservations pour un véhicule donné qui chevauchent une période donnée,
      */
     @Query("SELECT r FROM Reservation r " +
             "WHERE r.vehicle.id = :vehicleId " +
-            "AND r.reservationStatus.name = 'Confirmée' " +
             "AND r.startDate < :endDate AND r.endDate > :startDate")
-    List<Reservation> findConflictingReservations(@Param("vehicleId") Long vehicleId, @Param("startDate") LocalDateTime startDate, @Param("endDate") LocalDateTime endDate);
+    List<Reservation> findByVehicleIdAndDates(@Param("vehicleId") Long vehicleId, @Param("startDate") LocalDateTime startDate, @Param("endDate") LocalDateTime endDate);
 
 }
