@@ -29,6 +29,7 @@ public abstract class ReservationMapper {
     @Mapping(source = "reservationStatus.id", target = "reservationStatusId")
     @Mapping(source = "vehicle.id", target = "vehicleId")
     @Mapping(source = "driver.id", target = "driverId")
+    @Mapping(target = "itineraryPoints", ignore = true)                 // Ignorer, car géré dans le reservationService
     public abstract ReservationDTO toDto(Reservation reservation);
 
     @Mapping(source = "startDate", target = "startDate")
@@ -36,6 +37,7 @@ public abstract class ReservationMapper {
     @Mapping(source = "reservationStatusId", target = "reservationStatus", qualifiedByName = "longToReservationStatus")
     @Mapping(source = "vehicleId", target = "vehicle", qualifiedByName = "longToVehicle")
     @Mapping(source = "driverId", target = "driver", qualifiedByName = "longToDriver")
+    @Mapping(target = "itineraryPoints", ignore = true)                 // Pas de champ correspondant dans l'entité
     public abstract Reservation toEntity(ReservationDTO reservationDTO);
 
     @Named("longToVehicle")
@@ -55,7 +57,6 @@ public abstract class ReservationMapper {
     @Named("longToReservationStatus")
     public ReservationStatus longToReservationStatus(Long statusId) {
         if (statusId == null) return null;
-        // Assurez-vous que ReservationStatusRepository existe
         return reservationStatusRepository.findById(statusId)
                 .orElseThrow(() -> new RessourceNotFoundException("Statut de réservation introuvable pour l'ID " + statusId));
     }

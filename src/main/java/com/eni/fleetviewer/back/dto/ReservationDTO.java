@@ -1,11 +1,15 @@
 package com.eni.fleetviewer.back.dto;
 
 import jakarta.validation.constraints.FutureOrPresent;
+import jakarta.validation.constraints.NotEmpty;
 import jakarta.validation.constraints.NotNull;
+import jakarta.validation.constraints.Size;
 import lombok.AllArgsConstructor;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
 import lombok.Setter;
+
+import java.util.List;
 
 @Setter
 @Getter
@@ -31,5 +35,9 @@ public class ReservationDTO {
 
     @NotNull
     private Long driverId;
+
+    @NotEmpty
+    @Size(min = 2, message = "Une réservation doit contenir au moins un point de départ et un point d'arrivée.")
+    private List<ItineraryPointDTO> itineraryPoints;
 
 }

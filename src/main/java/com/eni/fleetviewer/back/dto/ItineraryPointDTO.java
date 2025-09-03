@@ -1,5 +1,6 @@
 package com.eni.fleetviewer.back.dto;
 
+import jakarta.validation.constraints.NotNull;
 import lombok.*;
 
 import java.time.LocalDateTime;
@@ -10,9 +11,13 @@ import java.time.LocalDateTime;
 @AllArgsConstructor
 public class ItineraryPointDTO {
 
-    private Long reservationId;     // ID de la réservation (clé composite)
+    private Long reservationId;     // ID de la réservation (clé composite), null au moment de sa création
+
+    @NotNull
     private Long placeId;           // ID du lieu (clé composite)
+
+    @NotNull
     private LocalDateTime dateTime; // Date et heure du point d’itinéraire
-    private String pointType;       // Type (départ, arrivée, etc.)
+    private String pointType;       // Type (départ, arrivée, covoiturage, etc.)
 
 }
