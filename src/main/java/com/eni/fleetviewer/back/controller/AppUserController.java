@@ -2,194 +2,93 @@ package com.eni.fleetviewer.back.controller;
 
 import com.eni.fleetviewer.back.dto.AppUserDTO;
 import com.eni.fleetviewer.back.dto.ChangePasswordDTO;
-import com.eni.fleetviewer.back.dto.PersonDTO;
-import com.eni.fleetviewer.back.mapper.PlaceMapper;
-import com.eni.fleetviewer.back.mapper.UserMapper;
-import com.eni.fleetviewer.back.model.AppUser;
-import com.eni.fleetviewer.back.model.Person;
-import com.eni.fleetviewer.back.repository.AppUserRepository;
-import com.eni.fleetviewer.back.service.AuthService;
+import com.eni.fleetviewer.back.service.AppUserService;
 import com.eni.fleetviewer.back.service.JwtService;
-import org.springframework.beans.factory.annotation.Autowired;
+import lombok.RequiredArgsConstructor;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
-import org.springframework.validation.annotation.Validated;
-import org.springframework.web.bind.annotation.*;
-import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.security.core.Authentication;
-import org.springframework.security.core.context.SecurityContextHolder;
-import org.springframework.web.server.ResponseStatusException;
-
+import org.springframework.web.bind.annotation.*;
 
 import java.security.Principal;
-import java.util.*;
+import java.util.HashMap;
+import java.util.List;
+import java.util.Map;
 
 @RestController
-@RequestMapping("/api/users")   // Path pour l'API
+@RequestMapping("/api/users")
+@RequiredArgsConstructor
 public class AppUserController {
 
-    @Autowired private AppUserRepository userRepository;
-    @Autowired private AuthService authService;
-    @Autowired private JwtService jwtService;
-    @Autowired private PasswordEncoder passwordEncoder;
-    @Autowired private PlaceMapper placeMapper;
-    @Autowired private UserMapper userMapper;
+    private final AppUserService appUserService;
+    private final JwtService jwtService;
 
+    // ---- list ----
     @GetMapping
-    public List<AppUserDTO> getUsers() {    // Renvoie tous les utilisateurs
-        return userRepository.findAll().stream()
-                .map(userMapper::toDto)
-                .toList();
+    public List<AppUserDTO> getUsers() {
+        return appUserService.findAll();
     }
 
+    // ---- get by username ----
     @GetMapping("/{username}")
     public AppUserDTO getUserByUsername(@PathVariable String username) {
-        AppUser user = userRepository.findByUsername(username)
-                .orElseThrow(() -> new RuntimeException("Utilisateur non trouvé"));
-        return userMapper.toDto(user);
+        return appUserService.findByUsername(username);
     }
 
+    // ---- current (/me) ----
     @GetMapping("/me")
     public AppUserDTO getCurrentUser(Principal principal) {
-        AppUser user = userRepository.findByUsername(principal.getName())
-                .orElseThrow(() -> new RuntimeException("Utilisateur non trouvé"));
-        return userMapper.toDto(user);
+        return appUserService.currentUser(principal);
     }
 
     @PutMapping("/me")
     public ResponseEntity<?> updateCurrentUser(@RequestBody AppUserDTO userDTO, Principal principal) {
-        AppUser user = userRepository.findByUsername(principal.getName())
-                .orElseThrow(() -> new RuntimeException("Utilisateur non trouvé"));
-
-        String token = null;
-
-        // Si on change le username
-        boolean usernameChanged = !user.getUsername().equals(userDTO.getUsername());
-        if (usernameChanged) {
-            // Vérifier que le nouveau username n'existe pas déjà
-            Optional<AppUser> userOptional = userRepository.findByUsername(userDTO.getUsername());
-            if (userOptional.isPresent()) {
-                throw new RuntimeException("Nom d'utilisateur déjà utilisé");
-            }
-            // Vérifier que le mot de passe envoyé est correct
-            if (userDTO.getPassword() == null || !authService.checkPassword(user, userDTO.getPassword())) {
-                throw new RuntimeException("Mot de passe incorrect");
-            }
-            // Si tout est bon, on applique la modification
-            user.setUsername(userDTO.getUsername());
+        var result = appUserService.updateCurrentUser(userDTO, principal, jwtService);
+        if (result.token() != null) {
+            Map<String, Object> payload = new HashMap<>();
+            payload.put("user", result.user());
+            payload.put("token", result.token());
+            return ResponseEntity.ok(payload);
         }
-
-        //MAJ des infos personnelles (Person)
-        if (userDTO.getPerson() != null) {
-            Person p = user.getPerson();
-            if (p == null) p = new Person();
-            PersonDTO personDTO = userDTO.getPerson();
-
-            p.setFirstName(personDTO.getFirstName());
-            p.setLastName(personDTO.getLastName());
-            p.setEmail(personDTO.getEmail());
-            p.setPhone(personDTO.getPhone());
-            if (personDTO.getAddress() != null) p.setAddress(personDTO.getAddress().toEntity());
-            if (personDTO.getPlace() != null) p.setPlace(placeMapper.toEntity(personDTO.getPlace()));
-            user.setPerson(p);
-        }
-
-        AppUser savedUser = userRepository.save(user);
-
-        // Génère le token APRÈS le save
-        if (usernameChanged) {
-            token = jwtService.generateToken(savedUser);
-        }
-
-        if (token != null) {
-            Map<String, Object> response = new HashMap<>();
-            response.put("user", userMapper.toDto(savedUser));
-            response.put("token", token);
-            return ResponseEntity.ok(response);
-        } else {
-            return ResponseEntity.ok(userMapper.toDto(savedUser));
-        }
+        return ResponseEntity.ok(result.user());
     }
 
     @PutMapping("/me/password")
-    public ResponseEntity<?> changeCurrentUserPassword(
-            @RequestBody @Validated ChangePasswordDTO dto,
-            Principal principal) {
-
-        AppUser user = userRepository.findByUsername(principal.getName())
-                .orElseThrow(() -> new ResponseStatusException(HttpStatus.NOT_FOUND, "Utilisateur non trouvé"));
-
-        // Vérifier présence des champs
-        if (dto.getCurrentPassword() == null || dto.getNewPassword() == null ||
-                dto.getCurrentPassword().isBlank() || dto.getNewPassword().isBlank()) {
-            throw new ResponseStatusException(HttpStatus.BAD_REQUEST, "Tous les champs sont obligatoires");
-        }
-
-        // Vérifier que le nouveau mot de passe n'est pas le même que l'actuel
-        if (passwordEncoder.matches(dto.getNewPassword(), user.getPassword())) {
-            throw new ResponseStatusException(HttpStatus.BAD_REQUEST, "Le nouveau mot de passe doit être différent de l'actuel");
-        }
-
-        // Vérifier l'ancien mot de passe
-        if (!passwordEncoder.matches(dto.getCurrentPassword(), user.getPassword())) {
-            throw new ResponseStatusException(HttpStatus.UNAUTHORIZED, "Mot de passe actuel incorrect");
-        }
-
-        // Encode et set le nouveau mot de passe
-        user.setPassword(passwordEncoder.encode(dto.getNewPassword()));
-        userRepository.save(user);
-
-        return ResponseEntity.ok().build();
+    @ResponseStatus(HttpStatus.OK)
+    public void changeCurrentUserPassword(@RequestBody ChangePasswordDTO dto, Principal principal) {
+        appUserService.changeCurrentUserPassword(dto, principal);
     }
 
+    // ---- create ----
     @PostMapping
     public AppUserDTO createUser(@RequestBody AppUserDTO dto) {
-        AppUser u = userMapper.toEntity(dto);
-        u.setPassword(passwordEncoder.encode(dto.getPassword()));
-
-        AppUser savedUser = userRepository.save(u);
-        return userMapper.toDto(savedUser);
+        return appUserService.create(dto);
     }
 
+    // ---- update (ADMIN) ----
     @PutMapping("/{id}")
     public AppUserDTO updateUser(@PathVariable Long id, @RequestBody AppUserDTO userDTO) {
-        AppUser user = userRepository.findById(id)
-                .orElseThrow(() -> new RuntimeException("Utilisateur non trouvé"));
-
-        AppUser savedUser = userRepository.save(user);
-        return userMapper.toDto(savedUser);
+        return appUserService.update(id, userDTO);
     }
 
+    // ---- update status ----
     @PutMapping("/status/{id}")
     public AppUserDTO updateUserStatus(@PathVariable Long id, @RequestParam boolean enabled) {
-        AppUser user = userRepository.findById(id)
-                .orElseThrow(() -> new RuntimeException("Utilisateur non trouvé"));
-
-        user.setEnabled(enabled);
-        AppUser savedUser = userRepository.save(user);
-        return userMapper.toDto(savedUser);
+        return appUserService.updateStatus(id, enabled);
     }
 
+    // ---- delete ----
     @DeleteMapping("/{id}")
     @ResponseStatus(HttpStatus.NO_CONTENT)
     public void delete(@PathVariable Long id) {
-        userRepository.deleteById(id);
+        appUserService.delete(id);
     }
 
+    // ---- generate username ----
     @GetMapping("/generate-username")
-    public String generateUsername(@RequestParam String firstName, @RequestParam String lastName) {
-        String baseUsername = ((!firstName.isEmpty() ? firstName.trim().charAt(0) : "") + (!lastName.isEmpty() ? lastName.trim() : "")).toLowerCase();
-        String username = baseUsername;
-        Authentication authentication = SecurityContextHolder.getContext().getAuthentication();
-        String currentUsername = authentication.getName();
-
-        // Si ça existe déjà, ajouter suffixe alphanumérique aléatoire
-        while(userRepository.findByUsername(username)
-                .filter(user -> !user.getUsername().equals((currentUsername)))
-                .isPresent()) {
-            String randomSuffix = UUID.randomUUID().toString().substring(0, 3).toLowerCase();
-            username = baseUsername + randomSuffix;
-        }
-        return username;
+    public String generateUsername(@RequestParam String firstName,
+                                   @RequestParam String lastName,
+                                   Authentication authentication) {
+        return appUserService.generateUsername(firstName, lastName, authentication);
     }
 }

@@ -35,7 +35,11 @@ public class Place {
     @JoinColumn(name = "person_id")
     private Person createdBy; // "Lieux créé par .."
 
-    @ManyToOne(fetch = FetchType.LAZY)
-    @JoinColumn(name = "address_id", nullable = false)
+    @OneToOne(
+            cascade = CascadeType.ALL,      // PERSIST, MERGE, REMOVE, etc.
+            orphanRemoval = true,
+            fetch = FetchType.LAZY
+    )
+    @JoinColumn(name = "address_id", nullable = false, unique = true)
     private Address address;
 }
