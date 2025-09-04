@@ -31,8 +31,12 @@ public class Person {
     @Column(name = "phone")
     private String phone;
 
-    @ManyToOne(fetch = FetchType.LAZY)
-    @JoinColumn(name = "address_id")
+    @OneToOne(
+            cascade = CascadeType.ALL,      // PERSIST, MERGE, REMOVE, etc.
+            orphanRemoval = true,
+            fetch = FetchType.LAZY
+    )
+    @JoinColumn(name = "address_id", unique = true)
     private Address address;
 
     @ManyToOne(fetch = FetchType.LAZY)
