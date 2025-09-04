@@ -4,6 +4,7 @@ import com.eni.fleetviewer.back.dto.ItineraryPointDTO;
 import com.eni.fleetviewer.back.dto.ReservationDTO;
 import com.eni.fleetviewer.back.enums.Status;
 import com.eni.fleetviewer.back.exception.RessourceNotFoundException;
+import com.eni.fleetviewer.back.mapper.IdToEntityMapper;
 import com.eni.fleetviewer.back.mapper.ItineraryPointMapper;
 import com.eni.fleetviewer.back.mapper.ReservationMapper;
 import com.eni.fleetviewer.back.model.ItineraryPoint;
@@ -24,6 +25,7 @@ import java.util.stream.Collectors;
 public class ReservationService {
     private final ReservationRepository reservationRepository;
     private final ReservationMapper reservationMapper;
+    private final IdToEntityMapper idToEntityMapper;
     private final ReservationStatusRepository reservationStatusRepository;
     private final ItineraryPointMapper itineraryPointMapper;
     private final ItineraryPointRepository itineraryPointRepository;
@@ -81,7 +83,7 @@ public class ReservationService {
 
         /// 3. Conversion du DTO en entité pour manipulation et enregistrement, recuperation du statut pour evaluation /////////////
         Reservation reservation = reservationMapper.toEntity(dto);
-        ReservationStatus requestedStatus = reservationMapper.longToReservationStatus(dto.getReservationStatusId());
+        ReservationStatus requestedStatus = idToEntityMapper.longToReservationStatus(dto.getReservationStatusId());
         Reservation savedReservation = new Reservation();
 
         /// 4. Création de la réservation //////////////////////////////////////////////////////////////////////////////////////////
@@ -141,8 +143,8 @@ public class ReservationService {
                 .orElseThrow(() -> new RessourceNotFoundException("Réservation non trouvée pour l'id " + id));
 
         /// On n'autorise la mise à jour du Status et du Conducteur uniquement
-        reservation.setReservationStatus(reservationMapper.longToReservationStatus(reservationDTO.getReservationStatusId()));
-        reservation.setDriver(reservationMapper.longToDriver(reservationDTO.getDriverId()));
+        reservation.setReservationStatus(idToEntityMapper.longToReservationStatus(reservationDTO.getReservationStatusId()));
+        reservation.setDriver(idToEntityMapper.longToDriver(reservationDTO.getDriverId()));
 
         Reservation savedReservation = reservationRepository.save(reservation);
         return reservationMapper.toDto(savedReservation);

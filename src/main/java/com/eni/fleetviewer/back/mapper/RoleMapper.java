@@ -4,21 +4,14 @@ import com.eni.fleetviewer.back.dto.RoleDTO;
 import com.eni.fleetviewer.back.model.Role;
 import org.mapstruct.Mapper;
 import org.mapstruct.Mapping;
+import org.mapstruct.Mappings;
 
 @Mapper(componentModel = "spring")
-public abstract class RoleMapper {
+public interface RoleMapper {
 
-    /**
-     * Convertit une entité Role en RoleDTO.
-     */
-    @Mapping(source = "id", target = "id")
-    @Mapping(source = "description", target = "description")
-    public abstract RoleDTO toDto(Role role);
+    @Mappings({})
+    RoleDTO toDto(Role role);
 
-    /**
-     * Convertit un DTO Role en entité Role.
-     */
-    @Mapping(source = "id", target = "id")
-    @Mapping(source = "description", target = "description")
-    public abstract Role toEntity(RoleDTO dto);
+    @Mappings({})
+    Role toEntity(RoleDTO dto);
 }

@@ -2,6 +2,7 @@ package com.eni.fleetviewer.back.service;
 
 import com.eni.fleetviewer.back.dto.PlaceDTO;
 import com.eni.fleetviewer.back.exception.RessourceNotFoundException;
+import com.eni.fleetviewer.back.mapper.IdToEntityMapper;
 import com.eni.fleetviewer.back.mapper.PlaceMapper;
 import com.eni.fleetviewer.back.model.Place;
 import com.eni.fleetviewer.back.repository.PlaceRepository;
@@ -18,6 +19,7 @@ public class PlaceService {
 
     private final PlaceRepository placeRepo;
     private final PlaceMapper placeMapper;
+    private final IdToEntityMapper idToEntityMapper;
 
 
     /**
@@ -84,9 +86,8 @@ public class PlaceService {
         // Mise à jour des champs
         existing.setName(dto.getName());
         existing.setPublic(dto.isPublic());
-        existing.setPlaceType(placeMapper.longToPlaceType(dto.getPlaceTypeId()));
-        existing.setAddress(placeMapper.longToAddress(dto.getAddressId()));
-        existing.setCreatedBy(placeMapper.longToCreatedBy(dto.getCreatedById()));
+        existing.setPlaceType(idToEntityMapper.longToPlaceType(dto.getPlaceTypeId()));
+        existing.setAddress(idToEntityMapper.longToAddress(dto.getAddressId()));
         // Sauvegarde
         Place saved = placeRepo.save(existing);
         return placeMapper.toDto(saved);

@@ -10,32 +10,13 @@ import org.mapstruct.Named;
 import org.springframework.beans.factory.annotation.Autowired;
 
 @Mapper(componentModel = "spring")
-public abstract class ReservationStatusMapper {
+public interface ReservationStatusMapper {
 
-    @Autowired
-    protected ReservationStatusRepository reservationStatusRepository;
-
-    /**
-     * Convertit l'entité Status en DTO.
-     */
     @Mapping(source = "id", target = "id")
     @Mapping(source = "name", target = "name")
-    public abstract ReservationStatusDTO toDto(ReservationStatus entity);
+    ReservationStatusDTO toDto(ReservationStatus entity);
 
-    /**
-     * Convertit le DTO Status en entité.
-     */
     @Mapping(source = "id", target = "id")
     @Mapping(source = "name", target = "name")
-    public abstract ReservationStatus toEntity(ReservationStatusDTO dto);
-
-    /**
-     * Méthode utilitaire pour mapper un ID vers une entité Status.
-     */
-    @Named("reservationStatusIdToEntity")
-    public ReservationStatus reservationStatusIdToEntity(Long id) {
-        if (id == null) return null;
-        return reservationStatusRepository.findById(id)
-                .orElseThrow(() -> new RessourceNotFoundException("Statut de réservation introuvable pour l'ID " + id));
-    }
+    ReservationStatus toEntity(ReservationStatusDTO dto);
 }

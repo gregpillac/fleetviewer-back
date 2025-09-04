@@ -1,6 +1,7 @@
 package com.eni.fleetviewer.back.service;
 
 import com.eni.fleetviewer.back.dto.VehicleDTO;
+import com.eni.fleetviewer.back.mapper.IdToEntityMapper;
 import com.eni.fleetviewer.back.mapper.VehicleMapper;
 import com.eni.fleetviewer.back.model.Vehicle;
 import com.eni.fleetviewer.back.repository.VehicleRepository;
@@ -17,12 +18,7 @@ public class VehicleService {
 
     private final VehicleRepository vehicleRepo;
     private final VehicleMapper vehicleMapper;
-
-    public VehicleService(VehicleRepository vehicleRepo,
-                          VehicleMapper vehicleMapper) {
-        this.vehicleRepo = vehicleRepo;
-        this.vehicleMapper = vehicleMapper;
-    }
+    private final IdToEntityMapper idToEntityMapper;
 
     /**
      * Récupération de tous les véhicules.
@@ -90,7 +86,7 @@ public class VehicleService {
         existing.setMileage(dto.getMileage());
         existing.setIsRoadworthy(dto.getIsRoadworthy());
         existing.setIsInsuranceValid(dto.getIsInsuranceValid());
-        existing.setPlace(vehicleMapper.longToPlace(dto.getPlaceId()));
+        existing.setPlace(idToEntityMapper.longToPlace(dto.getPlaceId()));
         // Sauvegarde
         Vehicle saved = vehicleRepo.save(existing);
         return vehicleMapper.toDto(saved);
