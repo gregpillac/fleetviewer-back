@@ -66,10 +66,8 @@ CREATE TABLE places (
     name varchar(100) NOT NULL,
     is_public boolean NOT NULL,
     place_type_id bigint NOT NULL,
-    person_id bigint, -- créé par
     address_id bigint NOT NULL,
     CONSTRAINT fk_places_types FOREIGN KEY (place_type_id) REFERENCES place_types(place_type_id),
-    CONSTRAINT fk_places_persons FOREIGN KEY (person_id) REFERENCES persons(person_id) ON DELETE SET NULL,
     CONSTRAINT fk_places_addresses FOREIGN KEY (address_id) REFERENCES addresses(address_id)
 );
 

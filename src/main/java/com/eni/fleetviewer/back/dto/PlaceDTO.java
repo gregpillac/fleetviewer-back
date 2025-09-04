@@ -24,6 +24,4 @@ public class PlaceDTO {
     private Long placeTypeId;   // référence à l’entité PlaceType (type de lieu associé)
 
     private Long addressId;     // référence à l’entité Address (adresse associée)
-
-    private Long createdById;   // "Lieux créé par .." (optionnel, si nécessaire)
 }

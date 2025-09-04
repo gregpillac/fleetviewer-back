@@ -29,11 +29,11 @@ INSERT INTO addresses (address_line_1, address_line_2, postal_code, city, gps_co
     ('99 boulevard Sud', NULL, '06000', 'Nice', NULL);
 
 INSERT INTO place_types (name) VALUES ('Site');
-INSERT INTO places (name, is_public, place_type_id, person_id, address_id) VALUES
-    ('Siège Paris', true, 1, NULL, 1),
-    ('Agence Lyon', true, 1, NULL, 2),
-    ('Annexe Toulouse',true, 1, NULL, 3),
-    ('Bureau Nice', true, 1, NULL, 4);
+INSERT INTO places (name, is_public, place_type_id, address_id) VALUES
+    ('Siège Paris', true, 1, 1),
+    ('Agence Lyon', true, 1, 2),
+    ('Annexe Toulouse',true, 1, 3),
+    ('Bureau Nice', true, 1, 4);
 
 INSERT INTO persons (first_name, last_name, email, phone, address_id, place_id) VALUES
     ('FleetViewer', 'Admin', 'admin@example.com', '0610000001', 1, 1),

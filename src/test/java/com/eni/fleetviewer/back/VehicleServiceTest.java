@@ -2,6 +2,7 @@ package com.eni.fleetviewer.back;
 
 
 import com.eni.fleetviewer.back.dto.VehicleDTO;
+import com.eni.fleetviewer.back.mapper.IdToEntityMapper;
 import com.eni.fleetviewer.back.mapper.VehicleMapper;
 import com.eni.fleetviewer.back.model.Place;
 import com.eni.fleetviewer.back.model.Vehicle;
@@ -29,14 +30,14 @@ public class VehicleServiceTest {
     @Mock
     private VehicleRepository vehicleRepository;
 
-
     @Mock
     private VehicleMapper vehicleMapper;
 
+    @Mock
+    private IdToEntityMapper idToEntityMapper;
 
     @InjectMocks
     private VehicleService vehicleService;
-
 
     @BeforeEach
     public void setUp() {
@@ -130,7 +131,7 @@ public class VehicleServiceTest {
 
 
         when(vehicleRepository.findById(id)).thenReturn(Optional.of(existing));
-        when(vehicleMapper.longToPlace(1L)).thenReturn(place);
+        when(idToEntityMapper.longToPlace(1L)).thenReturn(place);
         when(vehicleRepository.save(existing)).thenReturn(updated);
         when(vehicleMapper.toDto(updated)).thenReturn(expectedDTO);
 

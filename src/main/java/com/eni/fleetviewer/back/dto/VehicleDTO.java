@@ -11,7 +11,7 @@ import lombok.Setter;
 @AllArgsConstructor
 public class VehicleDTO {
 
-private Long id;  // identifiant du véhicule (généré par la BDD)
+    private Long id;  // identifiant du véhicule (généré par la BDD)
 
     @NotNull
     private String licensePlate;    // numéro de plaque d’immatriculation
