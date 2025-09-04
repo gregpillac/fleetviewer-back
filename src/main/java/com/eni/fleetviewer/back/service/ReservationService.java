@@ -12,6 +12,7 @@ import com.eni.fleetviewer.back.model.ReservationStatus;
 import com.eni.fleetviewer.back.repository.ItineraryPointRepository;
 import com.eni.fleetviewer.back.repository.ReservationRepository;
 import com.eni.fleetviewer.back.repository.ReservationStatusRepository;
+import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
@@ -19,6 +20,7 @@ import java.util.List;
 import java.util.stream.Collectors;
 
 @Service
+@RequiredArgsConstructor
 public class ReservationService {
     private final ReservationRepository reservationRepository;
     private final ReservationMapper reservationMapper;
@@ -26,14 +28,6 @@ public class ReservationService {
     private final ItineraryPointMapper itineraryPointMapper;
     private final ItineraryPointRepository itineraryPointRepository;
 
-
-    public ReservationService(ReservationRepository reservationRepository, ReservationMapper reservationMapper, ReservationStatusRepository reservationStatusRepository, ItineraryPointMapper itineraryPointMapper, ItineraryPointRepository itineraryPointRepository) {
-        this.reservationRepository = reservationRepository;
-        this.reservationMapper = reservationMapper;
-        this.reservationStatusRepository = reservationStatusRepository;
-        this.itineraryPointMapper = itineraryPointMapper;
-        this.itineraryPointRepository = itineraryPointRepository;
-    }
 
     /**
      * Récupération de toutes les réservations.

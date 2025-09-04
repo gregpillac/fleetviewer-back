@@ -5,6 +5,7 @@ import com.eni.fleetviewer.back.exception.RessourceNotFoundException;
 import com.eni.fleetviewer.back.mapper.PlaceMapper;
 import com.eni.fleetviewer.back.model.Place;
 import com.eni.fleetviewer.back.repository.PlaceRepository;
+import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
@@ -12,16 +13,12 @@ import java.util.List;
 import java.util.stream.Collectors;
 
 @Service
+@RequiredArgsConstructor
 public class PlaceService {
 
     private final PlaceRepository placeRepo;
     private final PlaceMapper placeMapper;
 
-    public PlaceService(PlaceRepository placeRepo,
-                        PlaceMapper placeMapper) {
-        this.placeRepo = placeRepo;
-        this.placeMapper = placeMapper;
-    }
 
     /**
      * Récupération de tous les sites.

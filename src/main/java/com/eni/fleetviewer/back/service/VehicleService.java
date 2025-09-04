@@ -5,12 +5,14 @@ import com.eni.fleetviewer.back.mapper.VehicleMapper;
 import com.eni.fleetviewer.back.model.Vehicle;
 import com.eni.fleetviewer.back.repository.VehicleRepository;
 import com.eni.fleetviewer.back.exception.RessourceNotFoundException;
+import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 import java.util.List;
 import java.util.stream.Collectors;
 
 @Service
+@RequiredArgsConstructor
 public class VehicleService {
 
     private final VehicleRepository vehicleRepo;
