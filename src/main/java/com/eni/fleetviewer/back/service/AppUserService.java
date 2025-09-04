@@ -6,12 +6,11 @@ import com.eni.fleetviewer.back.dto.PersonDTO;
 import com.eni.fleetviewer.back.mapper.AddressMapper;
 import com.eni.fleetviewer.back.mapper.PlaceMapper;
 import com.eni.fleetviewer.back.mapper.UserMapper;
+import com.eni.fleetviewer.back.model.Address;
 import com.eni.fleetviewer.back.model.AppUser;
 import com.eni.fleetviewer.back.model.Person;
 import com.eni.fleetviewer.back.model.Role;
-import com.eni.fleetviewer.back.repository.AppUserRepository;
-import com.eni.fleetviewer.back.repository.PersonRepository;
-import com.eni.fleetviewer.back.repository.RoleRepository;
+import com.eni.fleetviewer.back.repository.*;
 import lombok.RequiredArgsConstructor;
 import org.springframework.http.HttpStatus;
 import org.springframework.security.core.Authentication;
@@ -33,12 +32,12 @@ public class AppUserService {
     private final AppUserRepository userRepository;
     private final RoleRepository roleRepository;
     private final PersonRepository personRepository;
+    private final AddressRepository addressRepository;
+    private final PlaceRepository placeRepository;
 
     private final PasswordEncoder passwordEncoder;
 
     private final UserMapper userMapper;
-    private final AddressMapper addressMapper;
-    private final PlaceMapper placeMapper;
 
     // --------- Queries ---------
 
@@ -180,24 +179,54 @@ public class AppUserService {
 
         // 2) MAJ infos Person (facultatif)
         if (dto.getPerson() != null) {
-            Person p = user.getPerson();
-            if (p == null) p = new Person(); // sécurité (normalement one-to-one not null)
+            Person p = Optional.ofNullable(user.getPerson()).orElseGet(Person::new);
             PersonDTO pdto = dto.getPerson();
 
             p.setFirstName(pdto.getFirstName());
             p.setLastName(pdto.getLastName());
             p.setEmail(pdto.getEmail());
             p.setPhone(pdto.getPhone());
-            if (pdto.getAddress() != null) p.setAddress(addressMapper.toEntity(pdto.getAddress()));
-            if (pdto.getPlace()   != null) p.setPlace(placeMapper.toEntity(pdto.getPlace()));
+
+            // ----- Address (clé du bug) -----
+            if (pdto.getAddress() != null) {
+                var ad = pdto.getAddress();
+
+                Address managedAddr;
+                if (ad.getId() != null) {
+                    managedAddr = addressRepository.findById(ad.getId())
+                            .orElseThrow(() -> new ResponseStatusException(
+                                    HttpStatus.NOT_FOUND, "Adresse introuvable: " + ad.getId()));
+                } else {
+                    managedAddr = new Address();
+                }
+
+                managedAddr.setAddressFirstLine(ad.getAddressFirstLine());
+                managedAddr.setAddressSecondLine(ad.getAddressSecondLine());
+                managedAddr.setPostalCode(ad.getPostalCode());
+                managedAddr.setCity(ad.getCity());
+
+                // assure un id si nouvelle adresse
+                managedAddr = addressRepository.save(managedAddr);
+
+                p.setAddress(managedAddr);
+            } else {
+                p.setAddress(null);
+            }
+
+            // ----- Place : référence managée uniquement -----
+            if (pdto.getPlace() != null && pdto.getPlace().getId() != null) {
+                p.setPlace(placeRepository.getReferenceById(pdto.getPlace().getId()));
+            } else {
+                p.setPlace(null);
+            }
+
             user.setPerson(p);
         }
 
         // 3) enabled/role/password
         user.setEnabled(dto.isEnabled());
         if (dto.getRole() != null && dto.getRole().getId() != null) {
-            Role ref = roleRepository.getReferenceById(dto.getRole().getId());
-            user.setRole(ref);
+            user.setRole(roleRepository.getReferenceById(dto.getRole().getId()));
         }
         if (dto.getPassword() != null && !dto.getPassword().isBlank() && !usernameChanged) {
             // Sur /me, si ce champ est utilisé pour "nouveau mot de passe", fais plutôt un endpoint dédié (déjà présent).
