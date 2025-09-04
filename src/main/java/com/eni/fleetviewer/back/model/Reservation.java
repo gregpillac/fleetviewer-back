@@ -18,8 +18,12 @@ public class Reservation {
     private Long id;
 
     @NotNull
-    @Column(name = "reservation_date", nullable = false)
-    private java.time.LocalDateTime date;
+    @Column(name = "start_date", nullable = false)
+    private java.time.LocalDateTime startDate;
+
+    @NotNull
+    @Column(name = "end_date", nullable = false)
+    private java.time.LocalDateTime endDate;
 
     @ManyToOne(fetch = FetchType.LAZY)
     @JoinColumn(name = "reservation_status_id", nullable = false)
@@ -31,5 +35,5 @@ public class Reservation {
 
     @ManyToOne(fetch = FetchType.LAZY)
     @JoinColumn(name = "person_id", nullable = false)
-    private Person person;
+    private Person driver;
 }
