@@ -30,8 +30,4 @@ public class ItineraryPoint {
     @NotNull
     @Column(name = "date_time", nullable = false)
     private LocalDateTime dateTime;
-
-    @NotNull
-    @Column(name = "point_type", nullable = false)
-    private String pointType;
 }

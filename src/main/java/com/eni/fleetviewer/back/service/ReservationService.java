@@ -75,19 +75,16 @@ public class ReservationService {
     @Transactional
     public ReservationDTO createReservation(ReservationDTO dto) {
 
-        /// 0. Validation des dates ///////////////////////////////////////////////////////////////////
+        /// 1. Validation des dates //////////////////////////////////////////////////////////////////////////////
         if (dto.getStartDate().isAfter(dto.getEndDate())) { throw new IllegalArgumentException("La date de début doit être avant la date de fin."); }
 
-        /// 3. Conversion du DTO en entité pour manipulation et enregistrement, recuperation du statut pour evaluation /////////////
+        /// 2. Conversion du DTO en entité pour enregistrement et recuperation du statut pour evaluation /////////
         Reservation reservation = reservationMapper.toEntity(dto);
         Status requestedStatus = dto.getReservationStatus();
-        Reservation savedReservation = new Reservation();
 
-        /// 4. Création de la réservation //////////////////////////////////////////////////////////////////////////////////////////
-
-        /// 4.1 Si on cree une indisponibilité de reservation, les reservations en cours ou en attente doivent être annulées ///////////////
+        /// 3. Création de la réservation ////////////////////////////////////////////////////////////////////////
+        /// 3.1 Si on cree une Indisponibilité de reservation, les reservations en cours ou en attente doivent être annulées ///
         if (requestedStatus == Status.UNAVAILABLE) {
-
             // Récupération des réservations conflictuelles pour les annuler.
             List<Reservation> conflictingReservations = getConflictingReservations(dto);
             if (!conflictingReservations.isEmpty()) {
@@ -98,35 +95,19 @@ public class ReservationService {
                 reservationRepository.saveAll(conflictingReservations);
                 // TODO: Envoyer une notification aux utilisateurs (et covoitureurs dans un second temps) dont la réservation est annulée.
             }
-
-        /// 4.2. Sinon on crée une demande de réservation standard ///////////////////////////////////////////////
+        /// 3.2. Sinon on crée une demande de réservation standard ///////////////////////////////////////////////
         } else {
             /// Vérification de la disponibilité du vehicule sur la plage de dates
             validateConflictingReservations(dto);
-            /// Vérification des points d'itinéraire (au moins un départ et une arrivée) //////////////////////////////////
-            validateItineraryPoints(dto.getItineraryPoints());
-            /// Définition du status par défaut à 'PENDING' (En attente') /////////////////////////////////////////////////
+            // TODO: Gerer l'affichage de l'erreur.
+            /// Si le statut n'est pas "UNAVAILABLE" on le force à 'PENDING' (En attente') ///////////////////////
             reservation.setReservationStatus(Status.PENDING);
-            ///Sauvegarde en BDD de la nouvelle réservation //////////////////////////////////////////////////////////////
-            savedReservation = reservationRepository.save(reservation);
-
-            /// 5. Création et sauvegarde des points d'itinéraire associés à la réservation //////////////////////////////
-            // TODO: DEPORTER cette logique dans un itineraryPointService
-            Long savedReservationId = savedReservation.getId();
-            List<ItineraryPoint> itineraryPoints = dto.getItineraryPoints().stream()
-                    .map(itineraryPoint -> {
-                        // On assigne l'ID de la réservation qui vient d'être créée au point d itinerarire
-                        itineraryPoint.setReservationId(savedReservationId);
-                        return itineraryPointMapper.toEntity(itineraryPoint);
-                    })
-                    .collect(Collectors.toList());
-
-            itineraryPointRepository.saveAll(itineraryPoints);
         }
+        /// Sauvegarde en BDD de la nouvelle réservation /////////////////////////////////////////////////////////
+        Reservation savedReservation = reservationRepository.save(reservation);
 
-        /// 6. Construction du DTO de retour complet ////////////////////////////////////////////////
-        // On rappelle getReservationById pour être sûr d'avoir l'état le plus à jour et pour inclure les points d'itinéraire dans la réponse(NON).
-        return getReservationById(savedReservation.getId());
+        /// 4. Construction du DTO de retour complet /////////////////////////////////////////////////////////////
+        return reservationMapper.toDto(savedReservation);
     }
 
 
@@ -153,30 +134,8 @@ public class ReservationService {
 
 
     /**
-     * Valide la liste des points points pour une reservation. On s'assure que :
-     * 1. La liste n'est pas nulle.
-     * 2. Qu'elle contient un point de depart et d'arrivée.
-     * @param points la liste des points à valider.
-     * @throws IllegalArgumentException si la liste est nulle et n'a pas exactement 1 depart et une arrivée.
-     */
-    private void validateItineraryPoints(List<ItineraryPointDTO> points) {
-        if (points == null) {
-            throw new IllegalArgumentException("La liste des points d'itinéraire ne peut pas être nulle.");
-        }
-        long departureCount = points.stream()
-                .filter(p -> "départ".equalsIgnoreCase(p.getPointType()))
-                .count();
-        long arrivalCount = points.stream()
-                .filter(p -> "arrivée".equalsIgnoreCase(p.getPointType()))
-                .count();
-        if (departureCount != 1 || arrivalCount != 1) {
-            throw new IllegalArgumentException("Une réservation doit contenir exactement un point de 'départ' et un point d''arrivée'.");
-        }
-    }
-
-    /**
      * Trouve les réservations pour un véhicule donné qui chevauchent une période donnée
-     * @param reservation la reservation pour le véhicule dont on souhaite charcher les réservations
+     * @param reservation la reservation pour le véhicule dont on souhaite chercher les réservations en conflit
      * @return la liste des réservations du véhicule sur la période
      */
     private List<Reservation> getConflictingReservations(ReservationDTO reservation) {
@@ -189,11 +148,12 @@ public class ReservationService {
 
 
     /**
-     * Valide la liste des points pour une reservation. On s'assure que :
+     * Vérifie que le véhicule n'est pas déjà réservé sur cette période.
+     * @param reservation la reservation pour le véhicule dont on souhaite chercher les réservations en conflit
+     * @throws IllegalStateException l'exception levée si le véhicule est déjà réservé sur cette période
      */
     private void validateConflictingReservations(ReservationDTO reservation) {
         List<Reservation> conflictingReservations = getConflictingReservations(reservation);
-
         if (!conflictingReservations.isEmpty()) {
             throw new IllegalStateException("Le véhicule est déjà réservé sur cette période.");
         }

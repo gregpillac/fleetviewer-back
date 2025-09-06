@@ -96,11 +96,15 @@ CREATE TYPE reservation_status_enum AS ENUM (
 -- Table 'reservations' (Réservations)
 CREATE TABLE reservations (
     reservation_id BIGSERIAL PRIMARY KEY,
+    departure_id bigint NOT NULL,
+    arrival_id bigint NOT NULL,
     start_date timestamp NOT NULL,
     end_date timestamp NOT NULL,
     reservation_status reservation_status_enum NOT NULL,
     vehicle_id bigint NOT NULL,
     person_id bigint NOT NULL,
+    CONSTRAINT fk_reservations_departure FOREIGN KEY (departure_id) REFERENCES places(place_id),
+    CONSTRAINT fk_reservations_arrival FOREIGN KEY (arrival_id) REFERENCES places(place_id),
     CONSTRAINT fk_reservations_vehicles FOREIGN KEY (vehicle_id) REFERENCES vehicles(vehicle_id),
     CONSTRAINT fk_reservations_persons FOREIGN KEY (person_id) REFERENCES persons(person_id)
 );
@@ -127,7 +131,6 @@ CREATE TABLE itinerary_points (
     reservation_id bigint,
     place_id bigint,
     date_time timestamp NOT NULL,
-    point_type varchar(50) NOT NULL,
     PRIMARY KEY (reservation_id, place_id),
     CONSTRAINT fk_itinerary_reservations FOREIGN KEY (reservation_id) REFERENCES reservations(reservation_id),
     CONSTRAINT fk_itinerary_places FOREIGN KEY (place_id) REFERENCES places(place_id)

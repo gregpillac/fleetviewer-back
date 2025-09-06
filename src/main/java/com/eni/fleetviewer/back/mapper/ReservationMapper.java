@@ -9,20 +9,24 @@ import org.mapstruct.Mapping;
 @Mapper(componentModel = "spring",uses = { IdToEntityMapper.class, ItineraryPointMapper.class })
 public interface ReservationMapper {
 
+    @Mapping(source = "departure.id", target = "departureId")
+    @Mapping(source = "arrival.id", target = "arrivalId")
     @Mapping(source = "startDate", target = "startDate")
     @Mapping(source = "endDate", target = "endDate")
     @Mapping(source = "reservationStatus", target = "reservationStatus")
     @Mapping(source = "vehicle.id", target = "vehicleId")
     @Mapping(source = "driver.id", target = "driverId")
-    @Mapping(target = "itineraryPoints", ignore = true)  // Ignoré, car il n'y a pas de champ correspondant dans l'entité
+    @Mapping(target = "itineraryPoints", ignore = true)  // Ignoré, car il n'y a pas de champ correspondant en BDD
     ReservationDTO toDto(Reservation reservation);
 
+    @Mapping(source = "departureId", target = "departure")
+    @Mapping(source = "arrivalId", target = "arrival")
     @Mapping(source = "startDate", target = "startDate")
     @Mapping(source = "endDate", target = "endDate")
     // MapStruct va chercher dans les mappers qu'il utilise une méthode qui prend un type source en paramètre et qui retourne un type du champ cible.
     @Mapping(source = "reservationStatus", target = "reservationStatus")
     @Mapping(source = "vehicleId", target = "vehicle")
     @Mapping(source = "driverId", target = "driver")
-    @Mapping(target = "itineraryPoints", ignore = true)  // ESSENTIEL : Ignorer ce champ car il n'existe pas dans l'entité Reservation
+    @Mapping(target = "itineraryPoints", ignore = true)  // Ignoré, car il n'y a pas de champ correspondant en BDD
     Reservation toEntity(ReservationDTO reservationDTO);
 }

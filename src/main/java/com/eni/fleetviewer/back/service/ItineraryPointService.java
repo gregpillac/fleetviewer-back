@@ -37,9 +37,7 @@ public class ItineraryPointService {
         ItineraryPointId id = new ItineraryPointId(reservationId, placeId);
         ItineraryPoint existing = repository.findById(id)
                 .orElseThrow(() -> new RessourceNotFoundException("Point d’itinéraire introuvable pour la réservation " + reservationId + " et le lieu " + placeId));
-
         existing.setDateTime(dto.getDateTime());
-        existing.setPointType(dto.getPointType());
 
         ItineraryPoint updated = repository.save(existing);
         return mapper.toDto(updated);

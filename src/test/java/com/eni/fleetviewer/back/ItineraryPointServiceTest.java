@@ -42,10 +42,10 @@ public class ItineraryPointServiceTest {
 
     @Test
     public void testCreate_shouldReturnSavedDTO() {
-        ItineraryPointDTO inputDTO = new ItineraryPointDTO(1L, 2L, LocalDateTime.now(), "ARRIVAL");
+        ItineraryPointDTO inputDTO = new ItineraryPointDTO(1L, 2L, LocalDateTime.now());
         ItineraryPoint entity = new ItineraryPoint();
         ItineraryPoint savedEntity = new ItineraryPoint();
-        ItineraryPointDTO expectedDTO = new ItineraryPointDTO(1L, 2L, inputDTO.getDateTime(), "ARRIVAL");
+        ItineraryPointDTO expectedDTO = new ItineraryPointDTO(1L, 2L, inputDTO.getDateTime());
 
         when(mapper.toEntity(inputDTO)).thenReturn(entity);
         when(repository.save(entity)).thenReturn(savedEntity);
@@ -66,7 +66,7 @@ public class ItineraryPointServiceTest {
         Long placeId = 2L;
         ItineraryPointId id = new ItineraryPointId(resId, placeId);
         ItineraryPoint entity = new ItineraryPoint();
-        ItineraryPointDTO dto = new ItineraryPointDTO(resId, placeId, LocalDateTime.now(), "DEPARTURE");
+        ItineraryPointDTO dto = new ItineraryPointDTO(resId, placeId, LocalDateTime.now());
 
         when(repository.findById(id)).thenReturn(Optional.of(entity));
         when(mapper.toDto(entity)).thenReturn(dto);
@@ -74,7 +74,6 @@ public class ItineraryPointServiceTest {
         ItineraryPointDTO result = service.getById(resId, placeId);
 
         assertNotNull(result);
-        assertEquals("DEPARTURE", result.getPointType());
         verify(repository).findById(id);
         verify(mapper).toDto(entity);
     }
@@ -90,11 +89,11 @@ public class ItineraryPointServiceTest {
         Place place = new Place();
         place.setId(placeId);
 
-        ItineraryPoint existing = new ItineraryPoint(reservation, place, LocalDateTime.now(), "ARRIVAL");
+        ItineraryPoint existing = new ItineraryPoint(reservation, place, LocalDateTime.now());
 
-        ItineraryPointDTO inputDTO = new ItineraryPointDTO(resId, placeId, LocalDateTime.now().plusHours(2), "DEPARTURE");
-        ItineraryPoint updated = new ItineraryPoint(reservation, place, inputDTO.getDateTime(), "DEPARTURE");
-        ItineraryPointDTO expectedDTO = new ItineraryPointDTO(resId, placeId, inputDTO.getDateTime(), "DEPARTURE");
+        ItineraryPointDTO inputDTO = new ItineraryPointDTO(resId, placeId, LocalDateTime.now().plusHours(2));
+        ItineraryPoint updated = new ItineraryPoint(reservation, place, inputDTO.getDateTime());
+        ItineraryPointDTO expectedDTO = new ItineraryPointDTO(resId, placeId, inputDTO.getDateTime());
 
         when(repository.findById(id)).thenReturn(Optional.of(existing));
         when(repository.save(existing)).thenReturn(updated);
@@ -103,7 +102,6 @@ public class ItineraryPointServiceTest {
         ItineraryPointDTO result = service.update(resId, placeId, inputDTO);
 
         assertNotNull(result);
-        assertEquals("DEPARTURE", result.getPointType());
         verify(repository).findById(id);
         verify(repository).save(existing);
         verify(mapper).toDto(updated);
@@ -119,7 +117,7 @@ public class ItineraryPointServiceTest {
         res.setId(resId);
         Place place = new Place();
         place.setId(placeId);
-        ItineraryPoint point = new ItineraryPoint(res, place, LocalDateTime.now(), "ARRIVAL");
+        ItineraryPoint point = new ItineraryPoint(res, place, LocalDateTime.now());
 
         when(repository.findById(id)).thenReturn(Optional.of(point));
 
@@ -133,8 +131,8 @@ public class ItineraryPointServiceTest {
         ItineraryPoint entity1 = new ItineraryPoint();
         ItineraryPoint entity2 = new ItineraryPoint();
 
-        ItineraryPointDTO dto1 = new ItineraryPointDTO(1L, 2L, LocalDateTime.now(), "DEPARTURE");
-        ItineraryPointDTO dto2 = new ItineraryPointDTO(3L, 4L, LocalDateTime.now(), "ARRIVAL");
+        ItineraryPointDTO dto1 = new ItineraryPointDTO(1L, 2L, LocalDateTime.now());
+        ItineraryPointDTO dto2 = new ItineraryPointDTO(3L, 4L, LocalDateTime.now());
 
         when(repository.findAll()).thenReturn(List.of(entity1, entity2));
         when(mapper.toDto(entity1)).thenReturn(dto1);

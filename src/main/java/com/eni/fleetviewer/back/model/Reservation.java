@@ -21,6 +21,14 @@ public class Reservation {
     @Column(name = "reservation_id")
     private Long id;
 
+    @ManyToOne(fetch = FetchType.LAZY)
+    @JoinColumn(name = "departure_id", nullable = false)
+    private Person departure;
+
+    @ManyToOne(fetch = FetchType.LAZY)
+    @JoinColumn(name = "arrival_id", nullable = false)
+    private Person arrival;
+
     @NotNull
     @Column(name = "start_date", nullable = false)
     private java.time.LocalDateTime startDate;

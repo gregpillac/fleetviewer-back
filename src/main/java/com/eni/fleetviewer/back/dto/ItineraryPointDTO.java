@@ -19,8 +19,4 @@ public class ItineraryPointDTO {
 
     @NotNull
     private LocalDateTime dateTime; // Date et heure du point d’itinéraire
-
-    @NotNull
-    private String pointType;       // Type (départ, arrivée, covoiturage, etc.)
-
 }

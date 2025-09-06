@@ -21,6 +21,12 @@ public class ReservationDTO {
     private Long id;
 
     @NotNull
+    private Long departureId;
+
+    @NotNull
+    private Long arrivalId;
+
+    @NotNull
     @FutureOrPresent(message = "La date de début ne peut pas être dans le passé.")
     private java.time.LocalDateTime startDate;
 
@@ -37,8 +43,6 @@ public class ReservationDTO {
     @NotNull
     private Long driverId;
 
-    @NotEmpty
-    @Size(min = 2, message = "Une réservation doit contenir au moins un point de départ et un point d'arrivée.")
     private List<ItineraryPointDTO> itineraryPoints;
 
 }
