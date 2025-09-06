@@ -1,5 +1,6 @@
 package com.eni.fleetviewer.back.model;
 
+import com.eni.fleetviewer.back.enums.Status;
 import jakarta.persistence.*;
 import jakarta.validation.constraints.NotNull;
 import lombok.*;
@@ -28,9 +29,9 @@ public class Reservation {
     @Column(name = "end_date", nullable = false)
     private java.time.LocalDateTime endDate;
 
-    @ManyToOne(fetch = FetchType.LAZY)
-    @JoinColumn(name = "reservation_status_id", nullable = false)
-    private ReservationStatus reservationStatus;
+    @Enumerated(EnumType.STRING)
+    @Column(name = "reservation_status", nullable = false)
+    private Status reservationStatus;
 
     @ManyToOne(fetch = FetchType.LAZY)
     @JoinColumn(name = "vehicle_id", nullable = false)

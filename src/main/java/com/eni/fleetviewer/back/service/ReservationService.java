@@ -9,10 +9,8 @@ import com.eni.fleetviewer.back.mapper.ItineraryPointMapper;
 import com.eni.fleetviewer.back.mapper.ReservationMapper;
 import com.eni.fleetviewer.back.model.ItineraryPoint;
 import com.eni.fleetviewer.back.model.Reservation;
-import com.eni.fleetviewer.back.model.ReservationStatus;
 import com.eni.fleetviewer.back.repository.ItineraryPointRepository;
 import com.eni.fleetviewer.back.repository.ReservationRepository;
-import com.eni.fleetviewer.back.repository.ReservationStatusRepository;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
@@ -26,7 +24,6 @@ public class ReservationService {
     private final ReservationRepository reservationRepository;
     private final ReservationMapper reservationMapper;
     private final IdToEntityMapper idToEntityMapper;
-    private final ReservationStatusRepository reservationStatusRepository;
     private final ItineraryPointMapper itineraryPointMapper;
     private final ItineraryPointRepository itineraryPointRepository;
 
@@ -83,22 +80,20 @@ public class ReservationService {
 
         /// 3. Conversion du DTO en entité pour manipulation et enregistrement, recuperation du statut pour evaluation /////////////
         Reservation reservation = reservationMapper.toEntity(dto);
-        ReservationStatus requestedStatus = idToEntityMapper.longToReservationStatus(dto.getReservationStatusId());
+        Status requestedStatus = dto.getReservationStatus();
         Reservation savedReservation = new Reservation();
 
         /// 4. Création de la réservation //////////////////////////////////////////////////////////////////////////////////////////
 
         /// 4.1 Si on cree une indisponibilité de reservation, les reservations en cours ou en attente doivent être annulées ///////////////
-        if (requestedStatus.getName().equalsIgnoreCase(Status.UNAVAILABLE.toString())) {
+        if (requestedStatus == Status.UNAVAILABLE) {
 
             // Récupération des réservations conflictuelles pour les annuler.
             List<Reservation> conflictingReservations = getConflictingReservations(dto);
             if (!conflictingReservations.isEmpty()) {
                 // On met à jour les réservations en conflit avec le statut "CANCELLED"
-                ReservationStatus cancelledStatus = reservationStatusRepository.findByName(Status.CANCELLED.toString())
-                        .orElseThrow(() -> new IllegalStateException("Le statut 'Annulée' est introuvable en base de données."));
                 for (Reservation conflict : conflictingReservations) {
-                    conflict.setReservationStatus(cancelledStatus);
+                    conflict.setReservationStatus(Status.CANCELLED);
                 }
                 reservationRepository.saveAll(conflictingReservations);
                 // TODO: Envoyer une notification aux utilisateurs (et covoitureurs dans un second temps) dont la réservation est annulée.
@@ -111,9 +106,7 @@ public class ReservationService {
             /// Vérification des points d'itinéraire (au moins un départ et une arrivée) //////////////////////////////////
             validateItineraryPoints(dto.getItineraryPoints());
             /// Définition du status par défaut à 'PENDING' (En attente') /////////////////////////////////////////////////
-            ReservationStatus pendingStatus = reservationStatusRepository.findByName(Status.PENDING.getStatus())
-                    .orElseThrow(() -> new IllegalStateException("Le statut par défaut 'En attente' n'a pas été trouvé en base de données."));
-            reservation.setReservationStatus(pendingStatus);
+            reservation.setReservationStatus(Status.PENDING);
             ///Sauvegarde en BDD de la nouvelle réservation //////////////////////////////////////////////////////////////
             savedReservation = reservationRepository.save(reservation);
 
@@ -138,13 +131,13 @@ public class ReservationService {
 
 
     @Transactional
-    public ReservationDTO updateReservation(Long id, ReservationDTO reservationDTO) {
+    public ReservationDTO updateReservation(Long id, ReservationDTO dto) {
         Reservation reservation = reservationRepository.findById(id)
                 .orElseThrow(() -> new RessourceNotFoundException("Réservation non trouvée pour l'id " + id));
 
         /// On n'autorise la mise à jour du Status et du Conducteur uniquement
-        reservation.setReservationStatus(idToEntityMapper.longToReservationStatus(reservationDTO.getReservationStatusId()));
-        reservation.setDriver(idToEntityMapper.longToDriver(reservationDTO.getDriverId()));
+        reservation.setReservationStatus(dto.getReservationStatus());
+        reservation.setDriver(idToEntityMapper.longToDriver(dto.getDriverId()));
 
         Reservation savedReservation = reservationRepository.save(reservation);
         return reservationMapper.toDto(savedReservation);

@@ -19,18 +19,6 @@ create table place_types (
     name varchar(80) NOT NULL
 );
 
--- Table 'vehicle_status' (statuts de Véhicule)
-CREATE TABLE vehicle_status (
-    vehicle_status_id BIGSERIAL PRIMARY KEY,
-    name varchar(50) NOT NULL
-);
-
--- Table 'reservation_status' (statuts de Réservation)
-CREATE TABLE reservation_status (
-    reservation_status_id BIGSERIAL PRIMARY KEY,
-    name varchar(50) NOT NULL
-);
-
 -- Table 'document_type' (types de Document)
 CREATE TABLE document_types (
     document_type_id BIGSERIAL PRIMARY KEY,
@@ -49,17 +37,6 @@ CREATE TABLE roles (
     description varchar(255)
 );
 
--- Table 'persons' (Personnes)
-CREATE TABLE persons (
-    person_id BIGSERIAL PRIMARY KEY,
-    first_name varchar(60) NOT NULL,
-    last_name varchar(80) NOT NULL,
-    email varchar(100),
-    phone varchar(20),
-    address_id bigint,
-    CONSTRAINT fk_person_address FOREIGN KEY (address_id) REFERENCES addresses(address_id)
-);
-
 -- Table 'places' (Lieux)
 CREATE TABLE places (
     place_id BIGSERIAL PRIMARY KEY,
@@ -71,7 +48,18 @@ CREATE TABLE places (
     CONSTRAINT fk_places_addresses FOREIGN KEY (address_id) REFERENCES addresses(address_id)
 );
 
-
+-- Table 'persons' (Personnes)
+CREATE TABLE persons (
+    person_id BIGSERIAL PRIMARY KEY,
+    first_name varchar(60) NOT NULL,
+    last_name varchar(80) NOT NULL,
+    email varchar(100),
+    phone varchar(20),
+    address_id bigint,
+    place_id bigint,
+    CONSTRAINT fk_person_address FOREIGN KEY (address_id) REFERENCES addresses(address_id),
+    CONSTRAINT fk_persons_places FOREIGN KEY (place_id) REFERENCES places(place_id) ON DELETE SET NULL -- nullable pour éviter tout problème de référence circulaire
+);
 -- Table 'vehicles' (Véhicules)
 CREATE TABLE vehicles (
     vehicle_id BIGSERIAL PRIMARY KEY,
@@ -98,15 +86,21 @@ CREATE TABLE app_users (
     CONSTRAINT fk_users_persons FOREIGN KEY (person_id) REFERENCES persons(person_id)
 );
 
+CREATE TYPE reservation_status_enum AS ENUM (
+    'PENDING',
+    'CONFIRMED',
+    'CANCELLED',
+    'UNAVAILABLE'
+);
+
 -- Table 'reservations' (Réservations)
 CREATE TABLE reservations (
     reservation_id BIGSERIAL PRIMARY KEY,
     start_date timestamp NOT NULL,
     end_date timestamp NOT NULL,
-    reservation_status_id bigint NOT NULL,
+    reservation_status reservation_status_enum NOT NULL,
     vehicle_id bigint NOT NULL,
     person_id bigint NOT NULL,
-    CONSTRAINT fk_reservations_status FOREIGN KEY (reservation_status_id) REFERENCES reservation_status(reservation_status_id),
     CONSTRAINT fk_reservations_vehicles FOREIGN KEY (vehicle_id) REFERENCES vehicles(vehicle_id),
     CONSTRAINT fk_reservations_persons FOREIGN KEY (person_id) REFERENCES persons(person_id)
 );
@@ -148,15 +142,6 @@ CREATE TABLE vehicle_keys  (
     CONSTRAINT fk_keys_vehicles FOREIGN KEY (vehicle_id) REFERENCES vehicles(vehicle_id)
 );
 
--- Table 'vehicles_availabilities' (Disponibilités des véhicules)
-CREATE TABLE vehicles_availabilities (
-    vehicle_id bigint,
-    vehicle_status_id bigint,
-    PRIMARY KEY (vehicle_id, vehicle_status_id),
-    CONSTRAINT fk_availabilities_vehicles FOREIGN KEY (vehicle_id) REFERENCES vehicles(vehicle_id),
-    CONSTRAINT fk_availabilities_status FOREIGN KEY (vehicle_status_id) REFERENCES vehicle_status(vehicle_status_id)
-);
-
 -- Table 'rideshares' (Covoiturages)
 CREATE TABLE rideshares (
     person_id bigint,
@@ -183,12 +168,6 @@ CREATE TABLE roles_authorities (
     CONSTRAINT fk_authorities_roles FOREIGN KEY (role_id) REFERENCES roles(role_id),
     CONSTRAINT fk_roles_authorities FOREIGN KEY (authority_id) REFERENCES authorities(authority_id)
 );
-
-
--- Ajout de la référence vers le lieu dans 'persons' (nullable pour éviter tout problème de référence circulaire)
-ALTER TABLE persons
-    ADD COLUMN place_id bigint,
-    ADD CONSTRAINT fk_persons_places FOREIGN KEY (place_id) REFERENCES places(place_id) ON DELETE SET NULL;
 
 -- Fonction de vérification : s'assure que le lieu associé à une personne est bien de type 'Site'
 CREATE FUNCTION check_place_type_site_for_person() RETURNS trigger AS $$

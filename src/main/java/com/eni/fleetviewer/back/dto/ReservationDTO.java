@@ -1,5 +1,6 @@
 package com.eni.fleetviewer.back.dto;
 
+import com.eni.fleetviewer.back.enums.Status;
 import jakarta.validation.constraints.FutureOrPresent;
 import jakarta.validation.constraints.NotEmpty;
 import jakarta.validation.constraints.NotNull;
@@ -28,7 +29,7 @@ public class ReservationDTO {
     private java.time.LocalDateTime endDate;
 
     @NotNull
-    private Long reservationStatusId;
+    private Status reservationStatus;
 
     @NotNull
     private Long vehicleId;

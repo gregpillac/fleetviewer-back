@@ -20,8 +20,6 @@ public abstract class IdToEntityMapper {
     @Autowired
     private ReservationRepository reservationRepository;
     @Autowired
-    private ReservationStatusRepository reservationStatusRepository;
-    @Autowired
     private PlaceRepository placeRepository;
     @Autowired
     private AddressRepository addressRepository;
@@ -45,12 +43,6 @@ public abstract class IdToEntityMapper {
     public Reservation longToReservation(Long id) {
         return reservationRepository.findById(id)
                 .orElseThrow(() -> new RessourceNotFoundException("Réservation introuvable pour l'ID " + id));
-    }
-
-    public ReservationStatus longToReservationStatus(Long statusId) {
-        if (statusId == null) return null;
-        return reservationStatusRepository.findById(statusId)
-                .orElseThrow(() -> new RessourceNotFoundException("Statut de réservation introuvable pour l'ID " + statusId));
     }
 
     public Place longToPlace(Long placeId) {
