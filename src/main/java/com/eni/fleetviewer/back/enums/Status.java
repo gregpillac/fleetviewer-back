@@ -4,15 +4,9 @@ import lombok.Getter;
 
 @Getter
 public enum Status {
+    PENDING,       // En attente de validation
+    CONFIRMED,     // Confirmée
+    CANCELLED,     // Annulée
+    UNAVAILABLE   // Indisponible
 
-    PENDING("PENDING"),         // En attente de validation
-    CONFIRMED("CONFIRMED"),     // Confirmée
-    CANCELLED("CANCELLED"),     // Annulée
-    UNAVAILABLE("UNAVAILABLE"); // Indisponible
-
-    private final String status;
-
-    Status(String status) {
-        this.status = status;
-    }
 }

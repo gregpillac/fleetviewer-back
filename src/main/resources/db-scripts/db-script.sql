@@ -101,7 +101,7 @@ CREATE TABLE reservations (
     start_date timestamp NOT NULL,
     end_date timestamp NOT NULL,
     reservation_status reservation_status_enum NOT NULL,
-    vehicle_id bigint NOT NULL,
+    vehicle_id bigint,
     person_id bigint NOT NULL,
     CONSTRAINT fk_reservations_departure FOREIGN KEY (departure_id) REFERENCES places(place_id),
     CONSTRAINT fk_reservations_arrival FOREIGN KEY (arrival_id) REFERENCES places(place_id),

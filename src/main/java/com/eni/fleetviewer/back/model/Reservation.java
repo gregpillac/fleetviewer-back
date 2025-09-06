@@ -4,6 +4,8 @@ import com.eni.fleetviewer.back.enums.Status;
 import jakarta.persistence.*;
 import jakarta.validation.constraints.NotNull;
 import lombok.*;
+import org.hibernate.annotations.JdbcType;
+import org.hibernate.dialect.PostgreSQLEnumJdbcType;
 
 import java.util.ArrayList;
 import java.util.List;
@@ -38,11 +40,14 @@ public class Reservation {
     private java.time.LocalDateTime endDate;
 
     @Enumerated(EnumType.STRING)
-    @Column(name = "reservation_status", nullable = false)
+    @JdbcType(PostgreSQLEnumJdbcType.class) // <-- bind correct en ENUM PG
+    @Column(name = "reservation_status",
+            nullable = false,
+            columnDefinition = "reservation_status_enum")
     private Status reservationStatus;
 
     @ManyToOne(fetch = FetchType.LAZY)
-    @JoinColumn(name = "vehicle_id", nullable = false)
+    @JoinColumn(name = "vehicle_id")
     private Vehicle vehicle;
 
     @ManyToOne(fetch = FetchType.LAZY)
