@@ -58,7 +58,8 @@ CREATE TABLE persons (
     address_id bigint,
     place_id bigint,
     CONSTRAINT fk_person_address FOREIGN KEY (address_id) REFERENCES addresses(address_id),
-    CONSTRAINT fk_persons_places FOREIGN KEY (place_id) REFERENCES places(place_id) ON DELETE SET NULL -- nullable pour éviter tout problème de référence circulaire
+    CONSTRAINT fk_persons_places FOREIGN KEY (place_id) REFERENCES places(place_id) ON DELETE SET NULL,
+    CONSTRAINT uk_persons_address UNIQUE (address_id)
 );
 -- Table 'vehicles' (Véhicules)
 CREATE TABLE vehicles (
@@ -83,7 +84,9 @@ CREATE TABLE app_users (
     role_id varchar(50) NOT NULL,
     person_id bigint NOT NULL,
     CONSTRAINT fk_users_roles FOREIGN KEY (role_id) REFERENCES roles(role_id),
-    CONSTRAINT fk_users_persons FOREIGN KEY (person_id) REFERENCES persons(person_id)
+    CONSTRAINT fk_users_persons FOREIGN KEY (person_id) REFERENCES persons(person_id)ON DELETE CASCADE,
+    CONSTRAINT uk_app_users_username UNIQUE (username),
+    CONSTRAINT uk_app_users_person UNIQUE (person_id)
 );
 
 CREATE TYPE reservation_status_enum AS ENUM (
