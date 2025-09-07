@@ -139,8 +139,9 @@ CREATE TABLE itinerary_points (
 -- Table 'vehicle_keys' (Clés de Véhicule)
 CREATE TABLE vehicle_keys  (
     vehicle_key_id BIGSERIAL PRIMARY KEY,
-    place_id bigint,
-    vehicle_id bigint,
+    tag_label VARCHAR(64),
+    place_id bigint NOT NULL,
+    vehicle_id bigint NOT NULL,
     CONSTRAINT fk_keys_places FOREIGN KEY (place_id) REFERENCES places(place_id),
     CONSTRAINT fk_keys_vehicles FOREIGN KEY (vehicle_id) REFERENCES vehicles(vehicle_id)
 );

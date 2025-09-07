@@ -3,6 +3,8 @@ package com.eni.fleetviewer.back.model;
 import jakarta.persistence.*;
 import jakarta.validation.constraints.NotNull;
 import lombok.*;
+import java.util.Set;
+import java.util.HashSet;
 
 @Entity
 @Getter
@@ -37,4 +39,7 @@ public class Place {
     )
     @JoinColumn(name = "address_id", nullable = false, unique = true)
     private Address address;
+
+    @OneToMany(mappedBy = "place")
+    private Set<VehicleKey> keys = new HashSet<>();
 }

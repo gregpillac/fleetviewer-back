@@ -16,6 +16,8 @@ public abstract class IdToEntityMapper {
     @Autowired
     private VehicleRepository vehicleRepository;
     @Autowired
+    private VehicleKeyRepository vehicleKeyRepository;
+    @Autowired
     private PersonRepository personRepository;
     @Autowired
     private ReservationRepository reservationRepository;
@@ -26,7 +28,11 @@ public abstract class IdToEntityMapper {
     @Autowired
     private PlaceTypeRepository placeTypeRepository;
 
-
+    public VehicleKey longToVehicleKey(Long keyId) {
+        if (keyId == null) return null;
+        return vehicleKeyRepository.findById(keyId)
+                .orElseThrow(() -> new RessourceNotFoundException("Clé de véhicule introuvable pour l'ID " + keyId));
+    }
 
     public Vehicle longToVehicle(Long vehicleId) {
         if (vehicleId == null) return null;

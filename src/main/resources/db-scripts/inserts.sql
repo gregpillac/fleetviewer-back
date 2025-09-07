@@ -54,9 +54,14 @@ INSERT INTO app_users (username, password, role_id, enabled, person_id) VALUES
     ('fuser',     '$2a$10$YzAwCQwO6imqWTayy8Ir8.htkBQQ8We9MnOjhfk2WJeDBFHlWFyTO', 'ROLE_USER',     true, 3), --mdp = user
     ('fdefault',  '$2a$10$WDeu79o3MA3RGQfLFgAg5.1zQqz.xMlTcR1SrMfV.byud0EdSA6JW', 'ROLE_DEFAULT', true, 4); --mdp = default
 
-INSERT INTO public.vehicles(
+INSERT INTO vehicles(
     vehicle_id, license_plate, brand, model, seats, mileage, is_roadworthy, is_insurance_valid, place_id)
 VALUES
     (1, 'BP-701-WY', 'Toyota', 'Yaris', 5, 10000, true, true, 1),
     (2, 'DJ-408-CX', 'Renault', 'Clio', 5, 25000, true, true, 1),
     (3, 'CK-755-GB', 'Peugeot', '208', 5, 25000, true, true, 2);
+
+INSERT INTO vehicle_keys(tag_label, vehicle_id, place_id) VALUES
+    ( 'BP-701-WY_01', '1', '1'),
+    ( 'BP-701-WY_02', '1', '2'),
+    ( 'DJ-408-CX_01', '2', '1');

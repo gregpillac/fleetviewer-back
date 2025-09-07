@@ -16,11 +16,14 @@ public class VehicleKey {
     @Column(name = "vehicle_key_id")
     private Long id;
 
-    @ManyToOne(fetch = FetchType.LAZY)
-    @JoinColumn(name = "place_id")
+    @Column(name = "tag_label", nullable = false)
+    private String tagLabel;
+
+    @ManyToOne(fetch = FetchType.LAZY, optional = false)
+    @JoinColumn(name = "place_id", nullable = false)
     private Place place;
 
-    @ManyToOne(fetch = FetchType.LAZY)
-    @JoinColumn(name = "vehicle_id")
+    @ManyToOne(fetch = FetchType.LAZY, optional = false)
+    @JoinColumn(name = "vehicle_id", nullable = false)
     private Vehicle vehicle;
 }

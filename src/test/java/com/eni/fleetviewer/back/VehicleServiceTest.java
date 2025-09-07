@@ -16,6 +16,7 @@ import org.mockito.Mock;
 import org.mockito.MockitoAnnotations;
 
 
+import java.util.HashSet;
 import java.util.List;
 import java.util.Optional;
 
@@ -49,8 +50,8 @@ public class VehicleServiceTest {
     public void testAddVehicle_shouldReturnSavedVehicleDTO() {
         VehicleDTO inputDTO = new VehicleDTO(null, "AB-123-CD", "Peugeot", "208", 4, 50000L, true, true, 1L);
         Place place = new Place(); place.setId(1L);
-        Vehicle entity = new Vehicle(null, "AB-123-CD", "Peugeot", "208", 4, 50000L, true, true, place);
-        Vehicle saved = new Vehicle(1L, "AB-123-CD", "Peugeot", "208", 4, 50000L, true, true, place);
+        Vehicle entity = new Vehicle(null, "AB-123-CD", "Peugeot", "208", 4, 50000L, true, true, place, new HashSet<>());
+        Vehicle saved = new Vehicle(1L, "AB-123-CD", "Peugeot", "208", 4, 50000L, true, true, place, new HashSet<>());
         VehicleDTO expectedDTO = new VehicleDTO(1L, "AB-123-CD", "Peugeot", "208", 4, 50000L, true, true, 1L);
 
 
@@ -71,7 +72,7 @@ public class VehicleServiceTest {
     @Test
     public void testGetAllVehicles_shouldReturnVehicleList() {
         Place place = new Place(); place.setId(1L);
-        Vehicle vehicle = new Vehicle(1L, "AB-123-CD", "Peugeot", "208", 4, 50000L, true, true, place);
+        Vehicle vehicle = new Vehicle(1L, "AB-123-CD", "Peugeot", "208", 4, 50000L, true, true, place, new HashSet<>());
         VehicleDTO dto = new VehicleDTO(1L, "AB-123-CD", "Peugeot", "208", 4, 50000L, true, true, 1L);
 
 
@@ -91,7 +92,7 @@ public class VehicleServiceTest {
     public void testGetVehicleById_shouldReturnVehicleDTO() {
         Long id = 1L;
         Place place = new Place(); place.setId(1L);
-        Vehicle vehicle = new Vehicle(id, "AB-123-CD", "Peugeot", "208", 4, 50000L, true, true, place);
+        Vehicle vehicle = new Vehicle(id, "AB-123-CD", "Peugeot", "208", 4, 50000L, true, true, place, new HashSet<>());
         VehicleDTO dto = new VehicleDTO(id, "AB-123-CD", "Peugeot", "208", 4, 50000L, true, true, 1L);
 
 
@@ -124,9 +125,9 @@ public class VehicleServiceTest {
     public void testUpdateVehicle_shouldReturnUpdatedDTO() {
         Long id = 1L;
         Place place = new Place(); place.setId(1L);
-        Vehicle existing = new Vehicle(id, "AB-123-CD", "Peugeot", "208", 4, 50000L, true, true, place);
+        Vehicle existing = new Vehicle(id, "AB-123-CD", "Peugeot", "208", 4, 50000L, true, true, place, new HashSet<>());
         VehicleDTO inputDTO = new VehicleDTO(id, "AB-123-CD", "Peugeot", "208", 5, 52000L, false, false, 1L);
-        Vehicle updated = new Vehicle(id, "AB-123-CD", "Peugeot", "208", 5, 52000L, false, false, place);
+        Vehicle updated = new Vehicle(id, "AB-123-CD", "Peugeot", "208", 5, 52000L, false, false, place, new HashSet<>());
         VehicleDTO expectedDTO = new VehicleDTO(id, "AB-123-CD", "Peugeot", "208", 5, 52000L, false, false, 1L);
 
 

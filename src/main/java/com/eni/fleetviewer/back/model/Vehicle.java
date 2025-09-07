@@ -3,6 +3,8 @@ package com.eni.fleetviewer.back.model;
 import jakarta.persistence.*;
 import jakarta.validation.constraints.NotNull;
 import lombok.*;
+import java.util.Set;
+import java.util.HashSet;
 
 @Getter
 @Setter
@@ -49,4 +51,7 @@ public class Vehicle {
     @ManyToOne(fetch = FetchType.LAZY)
     @JoinColumn(name = "place_id", nullable = false)
     private Place place;
+
+    @OneToMany(mappedBy = "vehicle", cascade = CascadeType.ALL, orphanRemoval = true)
+    private Set<VehicleKey> keys = new HashSet<>();
 }
