@@ -25,11 +25,11 @@ public class Reservation {
 
     @ManyToOne(fetch = FetchType.LAZY)
     @JoinColumn(name = "departure_id", nullable = false)
-    private Person departure;
+    private Place departure;
 
     @ManyToOne(fetch = FetchType.LAZY)
     @JoinColumn(name = "arrival_id", nullable = false)
-    private Person arrival;
+    private Place arrival;
 
     @NotNull
     @Column(name = "start_date", nullable = false)

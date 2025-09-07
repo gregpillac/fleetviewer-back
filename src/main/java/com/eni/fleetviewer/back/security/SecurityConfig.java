@@ -53,9 +53,8 @@ public class SecurityConfig {
                         .requestMatchers(HttpMethod.GET, "/api/users/generate-username").authenticated()
                         .requestMatchers("/api/persons/**").hasAnyRole("ADMIN", "MANAGER")
                         .requestMatchers("/api/users/**").hasAnyRole("ADMIN", "MANAGER")
-                        .requestMatchers("/api/vehicles/**").hasAnyRole("ADMIN", "MANAGER")
-                        .requestMatchers("/api/vehicle-keys/**").hasAnyRole("ADMIN", "MANAGER")
-                        .requestMatchers("/api/places/**").hasAnyRole("ADMIN", "MANAGER")
+                        .requestMatchers("/api/vehicles/**").authenticated()
+                        .requestMatchers("/api/places/**").authenticated()
                         .requestMatchers("/api/reservations/**").authenticated() //TODO: gerer plus finement les droits
                         .anyRequest().authenticated()
                 )
