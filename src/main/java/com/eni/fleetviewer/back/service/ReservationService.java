@@ -100,8 +100,6 @@ public class ReservationService {
             /// Vérification de la disponibilité du vehicule sur la plage de dates
             validateConflictingReservations(dto);
             // TODO: Gerer l'affichage de l'erreur.
-            /// Si le statut n'est pas "UNAVAILABLE" on le force à 'PENDING' (En attente') ///////////////////////
-            reservation.setReservationStatus(Status.PENDING);
         }
         /// Sauvegarde en BDD de la nouvelle réservation /////////////////////////////////////////////////////////
         Reservation savedReservation = reservationRepository.save(reservation);
