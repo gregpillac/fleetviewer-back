@@ -65,3 +65,10 @@ INSERT INTO vehicle_keys(tag_label, vehicle_id, place_id) VALUES
     ( 'BP-701-WY_01', '1', '1'),
     ( 'BP-701-WY_02', '1', '2'),
     ( 'DJ-408-CX_01', '2', '1');
+
+-- Cas A : départ = Campus Nantes (place_id=1), start_date le 2025-09-15 -> DOIT matcher ("departure = requested")
+INSERT INTO reservations (departure_id, arrival_id, start_date, end_date, reservation_status, vehicle_id, person_id)
+VALUES (1, 2, '2025-09-15 07:30:00', '2025-09-19 19:00:00', 'CONFIRMED', 1, 1);
+
+
+

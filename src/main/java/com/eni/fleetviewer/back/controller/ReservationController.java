@@ -56,4 +56,13 @@ public class ReservationController {
         reservationService.deleteReservation(id);
         return ResponseEntity.noContent().build();
     }
+
+    @PostMapping("/compatibles")
+    public ResponseEntity<List<ReservationDTO>> getCompatibleReservations(@Valid @RequestBody ReservationDTO reservationDTO) {
+        //TODO: ajouter la requete de verification au repository
+        List<ReservationDTO> compatibleReservations = reservationService.getCompatibleReservations(reservationDTO);
+        return ResponseEntity.ok(compatibleReservations);
+    }
+
+
 }

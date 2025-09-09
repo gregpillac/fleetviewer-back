@@ -15,6 +15,7 @@ import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
+import java.time.LocalDateTime;
 import java.util.List;
 import java.util.stream.Collectors;
 
@@ -171,4 +172,30 @@ public class ReservationService {
             throw new IllegalStateException("Le véhicule est déjà réservé sur cette période.");
         }
     }
+
+    /**
+     * Trouve les réservations compatibles avec une réservation donnée.
+     * Une réservation est compatible si :
+     *  - soit (depart cherché = DEPART existant ET dateTime de départ cherché est le JOUR de DEPART existant),
+     *  - soit (depart cherché = DESTINATION existante ET dateTime de départ cherché est le JOUR de RETOUR existant).
+     *
+     * @param reservation la réservation de référence pour trouver des réservations compatibles
+     * @return la liste des DTO de réservations compatibles
+     */
+    public List<ReservationDTO> getCompatibleReservations(ReservationDTO reservation) {
+        Long departureRequestedPlaceId = reservation.getDepartureId();
+        LocalDateTime depStartOfDay = reservation.getStartDate().toLocalDate().atStartOfDay();
+        LocalDateTime depEndOfDay   = reservation.getStartDate().toLocalDate().plusDays(1).atStartOfDay();
+
+        // Récupérer les entités
+        List<Reservation> compatibles =  reservationRepository.findCompatibleReservationsOnStartDateAndPlace(
+                departureRequestedPlaceId,
+                depStartOfDay,
+                depEndOfDay
+            );
+        // Mapper vers DTO (pour alignement avec les autres methodes)
+        return compatibles.stream()
+                .map(reservationMapper::toDto)
+                .collect(java.util.stream.Collectors.toList());
+        }
 }
