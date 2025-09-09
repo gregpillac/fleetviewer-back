@@ -67,6 +67,21 @@ public class ReservationService {
     }
 
     /**
+     * Récupération des réservations par identifiant de conducteur.
+     * Retourne uniquement les DTO de réservation (sans points d’itinéraire) pour des raisons de performance.
+     * @param driverId l'identifiant du conducteur
+     * @return la liste des DTO de réservations du conducteur
+     */
+    @Transactional(readOnly = true)
+    public List<ReservationDTO> getReservationsByDriverId(Long driverId) {
+        List<Reservation> reservations = reservationRepository.findByDriverIdOrderByStartDateDesc(driverId);
+        return reservations
+                .stream()
+                .map(reservationMapper::toDto)
+                .collect(Collectors.toList());
+    }
+
+    /**
      * Création et persistance d’une nouvelle réservation à partir du DTO.
      * Création synchrone des itineraryPoints associés selon le type de réservation
      * @param dto le DTO à convertir en entité et à persister

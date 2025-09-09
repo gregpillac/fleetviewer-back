@@ -20,4 +20,5 @@ public interface ReservationRepository extends JpaRepository<Reservation, Long> 
             "AND r.startDate < :endDate AND r.endDate > :startDate")
     List<Reservation> findByVehicleIdAndDates(@Param("vehicleId") Long vehicleId, @Param("startDate") LocalDateTime startDate, @Param("endDate") LocalDateTime endDate);
 
+    List<Reservation> findByDriverIdOrderByStartDateDesc(Long driverId);
 }

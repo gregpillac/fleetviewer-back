@@ -32,6 +32,12 @@ public class ReservationController {
         return ResponseEntity.ok(reservation);
     }
 
+    @GetMapping("/by-driver/{driverId}")
+    public ResponseEntity<List<ReservationDTO>> getReservationsByDriver(@PathVariable Long driverId) {
+        List<ReservationDTO> reservations = reservationService.getReservationsByDriverId(driverId);
+        return ResponseEntity.ok(reservations);
+    }
+
     @PostMapping
     public ResponseEntity<ReservationDTO> createReservation(@Valid @RequestBody ReservationDTO reservationDTO) {
         ReservationDTO createdReservation = reservationService.createReservation(reservationDTO);
