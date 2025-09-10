@@ -92,6 +92,7 @@ CREATE TABLE app_users (
 CREATE TYPE reservation_status_enum AS ENUM (
     'PENDING',
     'CONFIRMED',
+    'REJECTED',
     'CANCELLED',
     'UNAVAILABLE'
 );
