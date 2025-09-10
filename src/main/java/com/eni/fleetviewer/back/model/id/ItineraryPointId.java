@@ -14,5 +14,5 @@ import java.io.Serializable;
 public class ItineraryPointId implements Serializable {
 
     private Long reservation;
-    private Long place;
+    private Long person;
 }

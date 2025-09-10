@@ -22,12 +22,17 @@ public class ItineraryPoint {
     @JoinColumn(name = "reservation_id")
     private Reservation reservation;
 
+    // Clé primaire composite définie dans la classe ItineraryPointId
     @Id
+    @ManyToOne(fetch = FetchType.LAZY)
+    @JoinColumn(name = "person_id")
+    private Person person;
+
     @ManyToOne(fetch = FetchType.LAZY)
     @JoinColumn(name = "place_id")
     private Place place;
 
     @NotNull
-    @Column(name = "date_time", nullable = false)
+    @Column(name = "date_time")
     private LocalDateTime dateTime;
 }

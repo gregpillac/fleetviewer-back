@@ -13,4 +13,7 @@ public interface ItineraryPointRepository extends JpaRepository<ItineraryPoint, 
 
     List<ItineraryPoint> findByReservationId(Long reservationId);
 
+    List<ItineraryPoint> findByPersonId(Long reservationId);
+
+
 }
