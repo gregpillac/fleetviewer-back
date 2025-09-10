@@ -15,8 +15,9 @@ public class ItineraryPointDTO {
     private Long reservationId;     // ID de la réservation (clé composite), null au moment de sa création
 
     @NotNull
+    private Long personId;          // ID du covoitureur (clé composite), null au moment de sa création
+
     private Long placeId;           // ID du lieu (clé composite)
 
-    @NotNull
-    private LocalDateTime dateTime; // Date et heure du point d’itinéraire
+    private LocalDateTime dateTime; // Date et heure du rdv (si different de la date de reservation)
 }

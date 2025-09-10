@@ -132,10 +132,12 @@ CREATE TABLE documents (
 -- Table 'itinerary_points' (Points d'itinéraire)
 CREATE TABLE itinerary_points (
     reservation_id bigint,
+    person_id bigint,
     place_id bigint,
-    date_time timestamp NOT NULL,
-    PRIMARY KEY (reservation_id, place_id),
+    date_time timestamp,
+    PRIMARY KEY (reservation_id, person_id),
     CONSTRAINT fk_itinerary_reservations FOREIGN KEY (reservation_id) REFERENCES reservations(reservation_id),
+    CONSTRAINT fk_itinerary_persons FOREIGN KEY (person_id) REFERENCES persons(person_id),
     CONSTRAINT fk_itinerary_places FOREIGN KEY (place_id) REFERENCES places(place_id)
 );
 

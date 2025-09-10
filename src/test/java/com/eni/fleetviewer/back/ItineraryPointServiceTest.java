@@ -3,6 +3,7 @@ package com.eni.fleetviewer.back;
 import com.eni.fleetviewer.back.dto.ItineraryPointDTO;
 import com.eni.fleetviewer.back.mapper.ItineraryPointMapper;
 import com.eni.fleetviewer.back.model.ItineraryPoint;
+import com.eni.fleetviewer.back.model.Person;
 import com.eni.fleetviewer.back.model.Place;
 import com.eni.fleetviewer.back.model.Reservation;
 import com.eni.fleetviewer.back.model.id.ItineraryPointId;
@@ -42,10 +43,10 @@ public class ItineraryPointServiceTest {
 
     @Test
     public void testCreate_shouldReturnSavedDTO() {
-        ItineraryPointDTO inputDTO = new ItineraryPointDTO(1L, 2L, LocalDateTime.now());
+        ItineraryPointDTO inputDTO = new ItineraryPointDTO(1L, 2L, 3L, LocalDateTime.now());
         ItineraryPoint entity = new ItineraryPoint();
         ItineraryPoint savedEntity = new ItineraryPoint();
-        ItineraryPointDTO expectedDTO = new ItineraryPointDTO(1L, 2L, inputDTO.getDateTime());
+        ItineraryPointDTO expectedDTO = new ItineraryPointDTO(1L, 2L, 3L, inputDTO.getDateTime());
 
         when(mapper.toEntity(inputDTO)).thenReturn(entity);
         when(repository.save(entity)).thenReturn(savedEntity);
@@ -63,10 +64,11 @@ public class ItineraryPointServiceTest {
     @Test
     public void testGetById_shouldReturnDTO() {
         Long resId = 1L;
+        Long personId = 2L;
         Long placeId = 2L;
         ItineraryPointId id = new ItineraryPointId(resId, placeId);
         ItineraryPoint entity = new ItineraryPoint();
-        ItineraryPointDTO dto = new ItineraryPointDTO(resId, placeId, LocalDateTime.now());
+        ItineraryPointDTO dto = new ItineraryPointDTO(resId, personId, placeId, LocalDateTime.now());
 
         when(repository.findById(id)).thenReturn(Optional.of(entity));
         when(mapper.toDto(entity)).thenReturn(dto);
@@ -81,19 +83,22 @@ public class ItineraryPointServiceTest {
     @Test
     public void testUpdate_shouldReturnUpdatedDTO() {
         Long resId = 1L;
+        Long personId = 2L;
         Long placeId = 2L;
         ItineraryPointId id = new ItineraryPointId(resId, placeId);
 
         Reservation reservation = new Reservation();
         reservation.setId(resId);
+        Person person = new Person();
+        person.setId(personId);
         Place place = new Place();
         place.setId(placeId);
 
-        ItineraryPoint existing = new ItineraryPoint(reservation, place, LocalDateTime.now());
+        ItineraryPoint existing = new ItineraryPoint(reservation, person, place, LocalDateTime.now());
 
-        ItineraryPointDTO inputDTO = new ItineraryPointDTO(resId, placeId, LocalDateTime.now().plusHours(2));
-        ItineraryPoint updated = new ItineraryPoint(reservation, place, inputDTO.getDateTime());
-        ItineraryPointDTO expectedDTO = new ItineraryPointDTO(resId, placeId, inputDTO.getDateTime());
+        ItineraryPointDTO inputDTO = new ItineraryPointDTO(resId, personId, placeId, LocalDateTime.now().plusHours(2));
+        ItineraryPoint updated = new ItineraryPoint(reservation, person, place, inputDTO.getDateTime());
+        ItineraryPointDTO expectedDTO = new ItineraryPointDTO(resId, personId, placeId, inputDTO.getDateTime());
 
         when(repository.findById(id)).thenReturn(Optional.of(existing));
         when(repository.save(existing)).thenReturn(updated);
@@ -110,14 +115,17 @@ public class ItineraryPointServiceTest {
     @Test
     public void testDelete_shouldCallRepositoryDelete() {
         Long resId = 1L;
+        Long personId = 2L;
         Long placeId = 2L;
         ItineraryPointId id = new ItineraryPointId(resId, placeId);
 
         Reservation res = new Reservation();
         res.setId(resId);
+        Person person = new Person();
+        person.setId(personId);
         Place place = new Place();
         place.setId(placeId);
-        ItineraryPoint point = new ItineraryPoint(res, place, LocalDateTime.now());
+        ItineraryPoint point = new ItineraryPoint(res, person, place, LocalDateTime.now());
 
         when(repository.findById(id)).thenReturn(Optional.of(point));
 
@@ -131,8 +139,8 @@ public class ItineraryPointServiceTest {
         ItineraryPoint entity1 = new ItineraryPoint();
         ItineraryPoint entity2 = new ItineraryPoint();
 
-        ItineraryPointDTO dto1 = new ItineraryPointDTO(1L, 2L, LocalDateTime.now());
-        ItineraryPointDTO dto2 = new ItineraryPointDTO(3L, 4L, LocalDateTime.now());
+        ItineraryPointDTO dto1 = new ItineraryPointDTO(1L, 2L, 2L, LocalDateTime.now());
+        ItineraryPointDTO dto2 = new ItineraryPointDTO(3L,3L, 4L, LocalDateTime.now());
 
         when(repository.findAll()).thenReturn(List.of(entity1, entity2));
         when(mapper.toDto(entity1)).thenReturn(dto1);

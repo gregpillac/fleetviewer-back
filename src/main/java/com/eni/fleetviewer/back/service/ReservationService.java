@@ -117,10 +117,22 @@ public class ReservationService {
             validateConflictingReservations(dto);
             // TODO: Gerer l'affichage de l'erreur.
         }
-        /// Sauvegarde en BDD de la nouvelle réservation /////////////////////////////////////////////////////////
+
+        /// 4. Sauvegarde en BDD de la nouvelle réservation /////////////////////////////////////////////////////////
         Reservation savedReservation = reservationRepository.save(reservation);
 
-        /// 4. Construction du DTO de retour complet /////////////////////////////////////////////////////////////
+        /// 5. Création et sauvegarde des points d'itinéraire associés à la réservation //////////////////////////////
+        // TODO: DEPORTER cette logique dans un itineraryPointService
+        Long savedReservationId = savedReservation.getId();
+        List<ItineraryPoint> itineraryPoints = dto.getItineraryPoints().stream()
+                .map(itineraryPoint -> {
+                    // On assigne l'ID de la réservation qui vient d'être créée au point d itinerarire
+                    itineraryPoint.setReservationId(savedReservationId);
+                    return itineraryPointMapper.toEntity(itineraryPoint);
+                })
+                .toList();
+
+        /// 6. Construction du DTO de retour complet /////////////////////////////////////////////////////////////
         return reservationMapper.toDto(savedReservation);
     }
 
@@ -130,13 +142,14 @@ public class ReservationService {
         Reservation reservation = reservationRepository.findById(id)
                 .orElseThrow(() -> new RessourceNotFoundException("Réservation non trouvée pour l'id " + id));
 
-        /// On n'autorise la mise à jour du Status et du Conducteur uniquement
+        /// On autorise la mise à jour du Status et du Conducteur uniquement
         reservation.setReservationStatus(dto.getReservationStatus());
         reservation.setDriver(idToEntityMapper.longToDriver(dto.getDriverId()));
 
         Reservation savedReservation = reservationRepository.save(reservation);
         return reservationMapper.toDto(savedReservation);
     }
+
 
     @Transactional
     public void deleteReservation(Long id) {
