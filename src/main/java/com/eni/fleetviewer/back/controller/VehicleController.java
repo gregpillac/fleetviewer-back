@@ -96,4 +96,17 @@ public class VehicleController {
         vehicleService.deleteVehicleById(id);
         return ResponseEntity.noContent().build();
     }
+
+    /**
+     * GET /api/vehicles/byPlace{placeIdbyPlace{placeId} : Récupère une liste de véhicules par un identifiant du site de rattachement.
+     * @param placeId L'identifiant du site des vehicules à récupérer.
+     * @return ResponseEntity avec le statut 200 OK et le véhicule trouvé,
+     * ou 404 Not Found si l'ID n'existe pas (géré par un exception handler).
+     */
+    @GetMapping("/byPlace{placeId}")
+    public ResponseEntity<List<VehicleDTO>> getVehiclesByPlaceId (
+            @PathVariable Long placeId) {
+        List<VehicleDTO> vehicles = vehicleService.getVehiclesByPlaceId(placeId);
+        return ResponseEntity.ok(vehicles);
+    }
 }

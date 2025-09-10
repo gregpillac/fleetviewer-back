@@ -80,7 +80,7 @@ public class VehicleService {
         return vehicleMapper.toDto(saved);
     }
 
-/**
+    /**
      * Mise à jour d’un véhicule existant.
      * @param id l'identifiant du véhicule à mettre à jour
      * @param dto le DTO contenant les nouvelles informations
@@ -99,5 +99,17 @@ public class VehicleService {
         // Sauvegarde
         Vehicle saved = vehicleRepo.save(existing);
         return vehicleMapper.toDto(saved);
+    }
+
+    /**
+     * Récupération des véhicules par placeId.
+     * @return la liste des DTO de véhicules
+     */
+    @Transactional(readOnly = true)
+    public List<VehicleDTO> getVehiclesByPlaceId(Long id) {
+        return vehicleRepo.findByPlaceId(id)
+                .stream()
+                .map(vehicleMapper::toDto)
+                .toList();
     }
 }

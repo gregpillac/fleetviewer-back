@@ -58,8 +58,7 @@ CREATE TABLE persons (
     address_id bigint,
     place_id bigint,
     CONSTRAINT fk_person_address FOREIGN KEY (address_id) REFERENCES addresses(address_id),
-    CONSTRAINT fk_persons_places FOREIGN KEY (place_id) REFERENCES places(place_id) ON DELETE SET NULL,
-    CONSTRAINT uk_persons_address UNIQUE (address_id)
+    CONSTRAINT fk_persons_places FOREIGN KEY (place_id) REFERENCES places(place_id) ON DELETE SET NULL
 );
 -- Table 'vehicles' (Véhicules)
 CREATE TABLE vehicles (
