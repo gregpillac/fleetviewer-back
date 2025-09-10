@@ -4,6 +4,7 @@ import com.eni.fleetviewer.back.dto.PersonDTO;
 import com.eni.fleetviewer.back.service.PersonService;
 import lombok.RequiredArgsConstructor;
 import org.springframework.http.HttpStatus;
+import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 
 import java.util.List;
@@ -44,5 +45,18 @@ public class PersonController {
     @ResponseStatus(HttpStatus.NO_CONTENT)
     public void delete(@PathVariable Long id) {
         personService.deletePerson(id);
+    }
+
+    /**
+     * GET /api/persons/byPlace{placeIdbyPlace{placeId} : Récupère une liste de personnes l'identifiant de leur site de rattachement.
+     * @param placeId L'identifiant du site des personnes à récupérer.
+     * @return ResponseEntity avec le statut 200 OK et le véhicule trouvé,
+     * ou 404 Not Found si l'ID n'existe pas (géré par un exception handler).
+     */
+    @GetMapping("/byPlace{placeId}")
+    public ResponseEntity<List<PersonDTO>> getPersonsByPlaceId (
+            @PathVariable Long placeId) {
+        List<PersonDTO> persons = personService.getVehiclesByPlaceId(placeId);
+        return ResponseEntity.ok(persons);
     }
 }

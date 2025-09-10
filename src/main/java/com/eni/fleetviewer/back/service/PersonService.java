@@ -31,7 +31,6 @@ public class PersonService {
                 .toList();
     }
 
-
     @Transactional(readOnly = true)
     public List<PersonDTO> getPersonsByPlaceName(String placeName) {
         return personRepo.findByPlaceName(placeName)
@@ -77,5 +76,18 @@ public class PersonService {
             throw new ResponseStatusException(HttpStatus.NOT_FOUND, "Personne introuvable");
         }
         personRepo.deleteById(id);
+    }
+
+    /**
+     * Récupération des véhicules par placeId.
+     * @param id l'identifiant du lieu
+     * @return la liste des DTO de véhicules
+     */
+    @Transactional(readOnly = true)
+    public List<PersonDTO> getVehiclesByPlaceId(Long id) {
+        return personRepo.findByPlaceId(id)
+                .stream()
+                .map(personMapper::toDto)
+                .toList();
     }
 }
