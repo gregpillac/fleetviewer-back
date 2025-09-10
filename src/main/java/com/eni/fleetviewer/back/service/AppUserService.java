@@ -3,13 +3,12 @@ package com.eni.fleetviewer.back.service;
 import com.eni.fleetviewer.back.dto.AppUserDTO;
 import com.eni.fleetviewer.back.dto.ChangePasswordDTO;
 import com.eni.fleetviewer.back.dto.PersonDTO;
+import com.eni.fleetviewer.back.dto.PlaceDTO;
+import com.eni.fleetviewer.back.exception.RessourceNotFoundException;
 import com.eni.fleetviewer.back.mapper.AddressMapper;
 import com.eni.fleetviewer.back.mapper.PlaceMapper;
 import com.eni.fleetviewer.back.mapper.UserMapper;
-import com.eni.fleetviewer.back.model.Address;
-import com.eni.fleetviewer.back.model.AppUser;
-import com.eni.fleetviewer.back.model.Person;
-import com.eni.fleetviewer.back.model.Role;
+import com.eni.fleetviewer.back.model.*;
 import com.eni.fleetviewer.back.repository.*;
 import lombok.RequiredArgsConstructor;
 import org.springframework.http.HttpStatus;
@@ -53,6 +52,13 @@ public class AppUserService {
         AppUser user = userRepository.findByUsername(username)
                 .orElseThrow(() -> new ResponseStatusException(HttpStatus.NOT_FOUND, "Utilisateur non trouvé"));
         return userMapper.toDto(user);
+    }
+
+    @Transactional(readOnly = true)
+    public AppUserDTO findByPersonId(Long id) {
+        return userRepository.findByPersonId(id)
+                .map(userMapper::toDto)
+                .orElse(null);
     }
 
     @Transactional(readOnly = true)

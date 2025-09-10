@@ -2,19 +2,24 @@ package com.eni.fleetviewer.back.service;
 
 import com.eni.fleetviewer.back.dto.ItineraryPointDTO;
 import com.eni.fleetviewer.back.dto.ReservationDTO;
+import com.eni.fleetviewer.back.dto.VehicleDTO;
 import com.eni.fleetviewer.back.enums.Status;
 import com.eni.fleetviewer.back.exception.RessourceNotFoundException;
 import com.eni.fleetviewer.back.mapper.IdToEntityMapper;
 import com.eni.fleetviewer.back.mapper.ItineraryPointMapper;
 import com.eni.fleetviewer.back.mapper.ReservationMapper;
+import com.eni.fleetviewer.back.mapper.VehicleMapper;
 import com.eni.fleetviewer.back.model.ItineraryPoint;
 import com.eni.fleetviewer.back.model.Reservation;
+import com.eni.fleetviewer.back.model.Vehicle;
 import com.eni.fleetviewer.back.repository.ItineraryPointRepository;
 import com.eni.fleetviewer.back.repository.ReservationRepository;
+import com.eni.fleetviewer.back.repository.VehicleRepository;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
+import java.time.LocalDateTime;
 import java.util.List;
 import java.util.stream.Collectors;
 
@@ -25,7 +30,9 @@ public class ReservationService {
     private final ReservationMapper reservationMapper;
     private final IdToEntityMapper idToEntityMapper;
     private final ItineraryPointMapper itineraryPointMapper;
+    private final VehicleMapper vehicleMapper;
     private final ItineraryPointRepository itineraryPointRepository;
+    private final VehicleRepository vehicleRepository;
 
 
     /**
@@ -159,7 +166,6 @@ public class ReservationService {
         );
     }
 
-
     /**
      * Vérifie que le véhicule n'est pas déjà réservé sur cette période.
      * @param reservation la reservation pour le véhicule dont on souhaite chercher les réservations en conflit
@@ -170,5 +176,54 @@ public class ReservationService {
         if (!conflictingReservations.isEmpty()) {
             throw new IllegalStateException("Le véhicule est déjà réservé sur cette période.");
         }
+    }
+
+    @Transactional(readOnly = true)
+    public List<ReservationDTO> getByStatus(Status status, Long placeId) {
+        return reservationRepository.findByStatusAndOptionalPlace(status, placeId)
+                .stream()
+                .map(reservationMapper::toDto)
+                .toList();
+    }
+
+    /**
+     * Met à jour le statut d’une réservation.
+     * - CONFIRMED : nécessite un vehicleId et vérifie la disponibilité.
+     * - REJECTED  : simple changement de statut.
+     */
+    @Transactional
+    public ReservationDTO updateStatus(Long reservationId, Status status, Long vehicleId) {
+        Reservation r = reservationRepository.findById(reservationId)
+                .orElseThrow(() -> new RessourceNotFoundException("Réservation introuvable"));
+
+        if (status == Status.CONFIRMED) {
+            if (vehicleId == null) {
+                throw new IllegalArgumentException("Un véhicule doit être attribué pour confirmer la réservation.");
+            }
+            Vehicle v = vehicleRepository.findById(vehicleId)
+                    .orElseThrow(() -> new RessourceNotFoundException("Véhicule introuvable"));
+
+            boolean free = reservationRepository.isVehicleFree(v.getId(), r.getStartDate(), r.getEndDate(), Status.CONFIRMED, Status.PENDING);
+            if (!free) {
+                throw new IllegalStateException("Véhicule indisponible sur la période");
+            }
+            r.setVehicle(v);
+        }
+
+        r.setReservationStatus(status);
+        Reservation saved = reservationRepository.save(r);
+        return reservationMapper.toDto(saved);
+    }
+
+    @Transactional(readOnly = true)
+    public List<VehicleDTO> getAvailableVehicles(LocalDateTime start, LocalDateTime end, Long placeId) {
+        List<Vehicle> candidates = (placeId != null)
+                ? vehicleRepository.findByPlaceId(placeId)
+                : vehicleRepository.findAll();
+
+        return candidates.stream()
+                .filter(v -> reservationRepository.isVehicleFree(v.getId(), start, end, Status.CONFIRMED, Status.PENDING))
+                .map(vehicleMapper::toDto)
+                .toList();
     }
 }

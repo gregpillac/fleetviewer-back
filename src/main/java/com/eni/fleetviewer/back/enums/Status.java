@@ -6,6 +6,7 @@ import lombok.Getter;
 public enum Status {
     PENDING,       // En attente de validation
     CONFIRMED,     // Confirmée
+    REJECTED,     // Rejetée
     CANCELLED,     // Annulée
     UNAVAILABLE   // Indisponible
 
