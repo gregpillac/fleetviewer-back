@@ -1,12 +1,20 @@
 package com.eni.fleetviewer.back.controller;
 
 import com.eni.fleetviewer.back.dto.ReservationDTO;
+import com.eni.fleetviewer.back.dto.VehicleDTO;
+import com.eni.fleetviewer.back.dto.VehicleDTO;
+import com.eni.fleetviewer.back.enums.Status;
 import com.eni.fleetviewer.back.service.ReservationService;
 import jakarta.validation.Valid;
+import org.springframework.format.annotation.DateTimeFormat;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
+import com.eni.fleetviewer.back.enums.Status;
+import org.springframework.format.annotation.DateTimeFormat;
 
 import java.net.URI;
+import java.time.LocalDateTime;
+import java.time.LocalDateTime;
 import java.util.List;
 
 @RestController
@@ -63,6 +71,33 @@ public class ReservationController {
         List<ReservationDTO> compatibleReservations = reservationService.getCompatibleReservations(reservationDTO);
         return ResponseEntity.ok(compatibleReservations);
     }
+
+    // /api/reservations/by-status?status=PENDING[&placeId=123]
+    @GetMapping("/by-status")
+    public ResponseEntity<List<ReservationDTO>> getByStatus(
+            @RequestParam Status status,
+            @RequestParam(required = false) Long placeId) {
+        return ResponseEntity.ok(reservationService.getByStatus(status, placeId));
+    }
+
+    // /api/reservations/{id}/status?status=CONFIRMED[&vehicleId=7]
+    @PutMapping("/{id}/status")
+    public ResponseEntity<ReservationDTO> updateStatus(
+            @PathVariable Long id,
+            @RequestParam Status status,
+            @RequestParam(required = false) Long vehicleId) {
+        return ResponseEntity.ok(reservationService.updateStatus(id, status, vehicleId));
+    }
+
+    // GET /api/reservations/available-vehicles?start=...&end=...[&placeId=...]
+    @GetMapping("/available-vehicles")
+    public ResponseEntity<List<VehicleDTO>> getAvailable(
+            @RequestParam @DateTimeFormat(iso = DateTimeFormat.ISO.DATE_TIME) LocalDateTime start,
+            @RequestParam @DateTimeFormat(iso = DateTimeFormat.ISO.DATE_TIME) LocalDateTime end,
+            @RequestParam(required = false) Long placeId) {
+        return ResponseEntity.ok(reservationService.getAvailableVehicles(start, end, placeId));
+    }
+
 
 
 }

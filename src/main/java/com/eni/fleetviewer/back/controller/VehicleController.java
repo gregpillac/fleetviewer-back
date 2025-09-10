@@ -1,5 +1,6 @@
 package com.eni.fleetviewer.back.controller;
 
+import com.eni.fleetviewer.back.dto.PersonDTO;
 import com.eni.fleetviewer.back.dto.VehicleDTO;
 import com.eni.fleetviewer.back.service.VehicleService;
 import jakarta.validation.Valid;
@@ -31,7 +32,6 @@ public class VehicleController {
         return ResponseEntity.ok(vehicles);
     }
 
-
     /**
      * GET /api/vehicles/{id} : Récupère un véhicule par son identifiant.
      * @param id L'identifiant du véhicule à récupérer.
@@ -46,6 +46,10 @@ public class VehicleController {
         return ResponseEntity.ok(vehicle);
     }
 
+    @GetMapping("/place/{placeName}")
+    public List<VehicleDTO> getVehiclesByPlaceName(@PathVariable String placeName) {
+        return vehicleService.getVehiclesByPlaceName(placeName);
+    }
 
     /**
      * POST /api/vehicles : Crée un nouveau véhicule.

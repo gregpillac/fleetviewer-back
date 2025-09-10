@@ -29,6 +29,12 @@ public class AppUserController {
         return appUserService.findAll();
     }
 
+    @GetMapping("/by-person/{personId}")
+    public ResponseEntity<AppUserDTO> getByPerson(@PathVariable Long personId) {
+        var dto = appUserService.findByPersonId(personId);
+        return ResponseEntity.ok(dto);
+    }
+
     // ---- get by username ----
     @GetMapping("/{username}")
     public AppUserDTO getUserByUsername(@PathVariable String username) {

@@ -1,5 +1,6 @@
 package com.eni.fleetviewer.back.service;
 
+import com.eni.fleetviewer.back.dto.PersonDTO;
 import com.eni.fleetviewer.back.dto.VehicleDTO;
 import com.eni.fleetviewer.back.mapper.IdToEntityMapper;
 import com.eni.fleetviewer.back.mapper.VehicleMapper;
@@ -42,6 +43,14 @@ public class VehicleService {
         Vehicle vehicle = vehicleRepo.findById(id)
                 .orElseThrow(() -> new RessourceNotFoundException("Véhicule non trouvé pour l'id " + id));
         return vehicleMapper.toDto(vehicle);
+    }
+
+    @Transactional(readOnly = true)
+    public List<VehicleDTO> getVehiclesByPlaceName(String placeName) {
+        return vehicleRepo.findByPlaceName(placeName)
+                .stream()
+                .map(vehicleMapper::toDto)
+                .toList();
     }
 
     /**
