@@ -1,6 +1,5 @@
 package com.eni.fleetviewer.back.service;
 
-import com.eni.fleetviewer.back.dto.ItineraryPointDTO;
 import com.eni.fleetviewer.back.dto.ReservationDTO;
 import com.eni.fleetviewer.back.dto.VehicleDTO;
 import com.eni.fleetviewer.back.enums.Status;
@@ -129,6 +128,7 @@ public class ReservationService {
 
         /// 5. Création et sauvegarde des points d'itinéraire associés à la réservation //////////////////////////////
         // TODO: DEPORTER cette logique dans un itineraryPointService
+        if (dto.getItineraryPoints() != null && !dto.getItineraryPoints().isEmpty()) {
         Long savedReservationId = savedReservation.getId();
         List<ItineraryPoint> itineraryPoints = dto.getItineraryPoints().stream()
                 .map(itineraryPoint -> {
@@ -137,6 +137,7 @@ public class ReservationService {
                     return itineraryPointMapper.toEntity(itineraryPoint);
                 })
                 .toList();
+        }
 
         /// 6. Construction du DTO de retour complet /////////////////////////////////////////////////////////////
         return reservationMapper.toDto(savedReservation);
