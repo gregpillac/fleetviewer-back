@@ -50,6 +50,20 @@ public interface ReservationRepository extends JpaRepository<Reservation, Long> 
     //TOD0: à implémenter Apres ajout du nb de places restantes dans la Réservation
     //List<ReservationDTO> findCompatibleReservationsOnStartDateAndPlaceAndSeatsLeft();
 
+
+    /**
+     * Recherche les réservations par statut, avec un filtre optionnel sur le lieu.
+     * La requête sélectionne les réservations correspondant au statut fourni.
+     * Si un `placeId` est spécifié :
+     *   - on vérifie que le véhicule associé (s'il existe) appartient à ce lieu
+     *   - sinon, si le véhicule est absent mais qu'un conducteur est lié, on vérifie que ce conducteur appartient à ce lieu
+     * Si `placeId` est null, aucune restriction sur le lieu n'est appliquée.
+     * Le résultat est trié par date de début (startDate) croissante.
+     *
+     * @param status  le statut de la réservation (obligatoire)
+     * @param placeId l'identifiant du lieu (optionnel, peut être null)
+     * @return la liste des réservations correspondant aux critères
+     */
     @Query("""
       select r from Reservation r
       left join r.vehicle v

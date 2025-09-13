@@ -251,16 +251,4 @@ public class ReservationService {
         Reservation saved = reservationRepository.save(r);
         return reservationMapper.toDto(saved);
     }
-
-    @Transactional(readOnly = true)
-    public List<VehicleDTO> getAvailableVehicles(LocalDateTime start, LocalDateTime end, Long placeId) {
-        List<Vehicle> candidates = (placeId != null)
-                ? vehicleRepository.findByPlaceId(placeId)
-                : vehicleRepository.findAll();
-
-        return candidates.stream()
-                .filter(v -> reservationRepository.isVehicleFree(v.getId(), start, end, Status.CONFIRMED, Status.PENDING))
-                .map(vehicleMapper::toDto)
-                .toList();
-    }
 }

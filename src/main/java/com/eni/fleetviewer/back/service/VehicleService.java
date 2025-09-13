@@ -2,14 +2,18 @@ package com.eni.fleetviewer.back.service;
 
 import com.eni.fleetviewer.back.dto.PersonDTO;
 import com.eni.fleetviewer.back.dto.VehicleDTO;
+import com.eni.fleetviewer.back.enums.Status;
 import com.eni.fleetviewer.back.mapper.IdToEntityMapper;
 import com.eni.fleetviewer.back.mapper.VehicleMapper;
 import com.eni.fleetviewer.back.model.Vehicle;
+import com.eni.fleetviewer.back.repository.ReservationRepository;
 import com.eni.fleetviewer.back.repository.VehicleRepository;
 import com.eni.fleetviewer.back.exception.RessourceNotFoundException;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
+
+import java.time.LocalDateTime;
 import java.util.List;
 import java.util.stream.Collectors;
 
@@ -18,6 +22,7 @@ import java.util.stream.Collectors;
 public class VehicleService {
 
     private final VehicleRepository vehicleRepo;
+    private final ReservationRepository reservationRepo;
     private final VehicleMapper vehicleMapper;
     private final IdToEntityMapper idToEntityMapper;
 
@@ -109,6 +114,18 @@ public class VehicleService {
     public List<VehicleDTO> getVehiclesByPlaceId(Long id) {
         return vehicleRepo.findByPlaceId(id)
                 .stream()
+                .map(vehicleMapper::toDto)
+                .toList();
+    }
+
+    @Transactional(readOnly = true)
+    public List<VehicleDTO> getAvailableVehicles(LocalDateTime start, LocalDateTime end, Long placeId) {
+        List<Vehicle> candidates = (placeId != null)
+                ? vehicleRepo.findByPlaceId(placeId)
+                : vehicleRepo.findAll();
+
+        return candidates.stream()
+                .filter(v -> reservationRepo.isVehicleFree(v.getId(), start, end, Status.CONFIRMED, Status.PENDING))
                 .map(vehicleMapper::toDto)
                 .toList();
     }

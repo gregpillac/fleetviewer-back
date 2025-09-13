@@ -4,10 +4,12 @@ import com.eni.fleetviewer.back.dto.PersonDTO;
 import com.eni.fleetviewer.back.dto.VehicleDTO;
 import com.eni.fleetviewer.back.service.VehicleService;
 import jakarta.validation.Valid;
+import org.springframework.format.annotation.DateTimeFormat;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 
 import java.net.URI;
+import java.time.LocalDateTime;
 import java.util.List;
 
 @RestController
@@ -108,5 +110,14 @@ public class VehicleController {
             @PathVariable Long placeId) {
         List<VehicleDTO> vehicles = vehicleService.getVehiclesByPlaceId(placeId);
         return ResponseEntity.ok(vehicles);
+    }
+
+    // GET /api/reservations/available-vehicles?start=...&end=...[&placeId=...]
+    @GetMapping("/available-vehicles")
+    public ResponseEntity<List<VehicleDTO>> getAvailable(
+            @RequestParam @DateTimeFormat(iso = DateTimeFormat.ISO.DATE_TIME) LocalDateTime start,
+            @RequestParam @DateTimeFormat(iso = DateTimeFormat.ISO.DATE_TIME) LocalDateTime end,
+            @RequestParam(required = false) Long placeId) {
+        return ResponseEntity.ok(vehicleService.getAvailableVehicles(start, end, placeId));
     }
 }

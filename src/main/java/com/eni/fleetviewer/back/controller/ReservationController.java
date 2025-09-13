@@ -88,16 +88,4 @@ public class ReservationController {
             @RequestParam(required = false) Long vehicleId) {
         return ResponseEntity.ok(reservationService.updateStatus(id, status, vehicleId));
     }
-
-    // GET /api/reservations/available-vehicles?start=...&end=...[&placeId=...]
-    @GetMapping("/available-vehicles")
-    public ResponseEntity<List<VehicleDTO>> getAvailable(
-            @RequestParam @DateTimeFormat(iso = DateTimeFormat.ISO.DATE_TIME) LocalDateTime start,
-            @RequestParam @DateTimeFormat(iso = DateTimeFormat.ISO.DATE_TIME) LocalDateTime end,
-            @RequestParam(required = false) Long placeId) {
-        return ResponseEntity.ok(reservationService.getAvailableVehicles(start, end, placeId));
-    }
-
-
-
 }
