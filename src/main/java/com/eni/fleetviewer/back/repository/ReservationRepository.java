@@ -34,16 +34,19 @@ public interface ReservationRepository extends JpaRepository<Reservation, Long> 
     @Query("""
        SELECT r FROM Reservation r
        WHERE (
-              (r.departure.id = :requestedDeparturePlaceId
+              ((r.departure.id = :requestedDeparturePlaceId
+                OR r.departure.id = :requestedArrivalPlaceId)
                AND r.startDate >= :departureStartOfDay
                AND r.startDate <  :departureEndOfDay)
            OR (r.arrival.id = :requestedDeparturePlaceId
+               OR r.arrival.id = :requestedArrivalPlaceId)
                AND r.endDate >= :departureStartOfDay
                AND r.endDate <  :departureEndOfDay)
-         )
+                      AND r.reservationStatus = 'CONFIRMED'
        """)
     List<Reservation> findCompatibleReservationsOnStartDateAndPlace(
             @Param("requestedDeparturePlaceId") Long departurePlaceId,
+            @Param("requestedArrivalPlaceId") Long arrivalPlaceId,
             @Param("departureStartOfDay") LocalDateTime departureStartOfDay,
             @Param("departureEndOfDay")   LocalDateTime departureEndOfDay);
 

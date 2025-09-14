@@ -200,12 +200,14 @@ public class ReservationService {
      */
     public List<ReservationDTO> getCompatibleReservations(ReservationDTO reservation) {
         Long departureRequestedPlaceId = reservation.getDepartureId();
+        Long requestedArrivalPlaceId = reservation.getArrivalId();
         LocalDateTime depStartOfDay = reservation.getStartDate().toLocalDate().atStartOfDay();
         LocalDateTime depEndOfDay   = reservation.getStartDate().toLocalDate().plusDays(1).atStartOfDay();
 
         // Récupérer les entités
         List<Reservation> compatibles =  reservationRepository.findCompatibleReservationsOnStartDateAndPlace(
                 departureRequestedPlaceId,
+                requestedArrivalPlaceId,
                 depStartOfDay,
                 depEndOfDay
             );
